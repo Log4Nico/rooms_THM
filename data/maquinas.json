@@ -2,251 +2,301 @@
   {
     "nombre": "Pickle Rick",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/PickleRick"
   },
   {
     "nombre": "Agent Sudo",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/SudoAgent"
   },
   {
     "nombre": "Security Awareness",
     "dificultad": "Info",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Common Attacks",
     "dificultad": "Fácil",
-    "tipo": ["Teoría", "Ataques Comunes"]
+    "tipo": ["Teoría", "Ataques Comunes"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Pentesting Fundamentals",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Security Principles",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Introductory Researching",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Intro to Digital Forensics",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "DFIR: An Introduction",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Digital Forensics Case B4DM755",
     "dificultad": "Fácil",
-    "tipo": ["Teoría", "Forense"]
+    "tipo": ["Teoría", "Forense"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Nmap",
     "dificultad": "Fácil",
-    "tipo": ["Teoría"]
+    "tipo": ["Teoría"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Offensive Security Info",
     "dificultad": "Fácil",
-    "tipo": ["Teoría", "Pentesting"]
+    "tipo": ["Teoría", "Pentesting"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Red Team Fundamentals",
     "dificultad": "Fácil",
-    "tipo": ["Teoría", "Pentesting"]
+    "tipo": ["Teoría", "Pentesting"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Careers in Cyber",
     "dificultad": "Info",
-    "tipo": ["Teoría", "Todo"]
+    "tipo": ["Teoría", "Todo"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "c4ptur3-th3-fl4g",
     "dificultad": "Fácil",
-    "tipo": ["CTF"]
+    "tipo": ["CTF"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "XSS",
     "dificultad": "Fácil",
-    "tipo": ["Web", "Vulnerabilidad"]
+    "tipo": ["Web", "Vulnerabilidad"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "CSRF",
     "dificultad": "Media",
-    "tipo": ["Web", "Vulnerabilidad"]
+    "tipo": ["Web", "Vulnerabilidad"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Insecure Deserialisation",
     "dificultad": "Media",
-    "tipo": ["Web", "Vulnerabilidad"]
+    "tipo": ["Web", "Vulnerabilidad"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "SQL Injection",
     "dificultad": "Media",
-    "tipo": ["Web", "Vulnerabilidad"]
+    "tipo": ["Web", "Vulnerabilidad"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "SQLMAP",
     "dificultad": "Fácil",
-    "tipo": ["Herramienta", "Web"]
+    "tipo": ["Herramienta", "Web"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Ivenstigating Windows",
     "dificultad": "Fácil",
-    "tipo": ["Forense"]
+    "tipo": ["Forense"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Disk Analysis & Autopsy",
     "dificultad": "Media",
-    "tipo": ["Forense"]
+    "tipo": ["Forense"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Windows Forensics 1",
     "dificultad": "Media",
-    "tipo": ["Forense", "Windows"]
+    "tipo": ["Forense", "Windows"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Light",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Ignite",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Ignite"
   },
   {
     "nombre": "Bolt",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Bolt"
   },
   {
     "nombre": "Blue",
     "dificultad": "Fácil",
-    "tipo": ["Blue Team", "Resolución de incidentes"]
+    "tipo": ["Blue Team", "Resolución de incidentes"],
+    "ruta": "./rooms/Blue"
   },
   {
     "nombre": "Ice",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Ice"
   },
   {
     "nombre": "Kenobi",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Kenobi"
   },
   {
     "nombre": "Easy Peasy",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/EasyPeasy"
   },
   {
     "nombre": "Blaster",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Blaster"
   },
   {
-    "nombre": "Daili Bugle",
+    "nombre": "Daily Bugle",
     "dificultad": "Difícil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/DailyBugle"
   },
   {
     "nombre": "Library",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Library"
   },
   {
     "nombre": "Retro",
     "dificultad": "Difícil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Retro"
   },
   {
     "nombre": "Tech_Supp0rt: 1",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Relevant",
     "dificultad": "Media",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Relevant"
   },
   {
     "nombre": "Anthem",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Anthem"
   },
   {
     "nombre": "Basic Pentesting",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/BasicPentesting"
   },
   {
     "nombre": "RootMe",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/RootMe"
   },
   {
     "nombre": "Brooklym Nine Nine",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/BrooklymNineNine"
   },
   {
     "nombre": "Bounty hacker",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Bountyhacker"
   },
   {
     "nombre": "Poster",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/Poster"
   },
   {
     "nombre": "Startup",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/StartUp"
   },
   {
     "nombre": "LazyAdmin",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/LazyAdmin"
   },
   {
     "nombre": "Soc Fundamentals",
     "dificultad": "Fácil",
-    "tipo": ["Blue Team", "SOC"]
+    "tipo": ["Blue Team", "SOC"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "SOC L1 Alert Triage",
     "dificultad": "Fácil",
-    "tipo": ["Blue Team", "SOC"]
+    "tipo": ["Blue Team", "SOC"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Simple CTF",
     "dificultad": "Fácil",
-    "tipo": ["CTF"]
+    "tipo": ["CTF"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Mobile Acquisition",
     "dificultad": "Info",
-    "tipo": ["Teoría", "Forense", "Móvil"]
+    "tipo": ["Teoría", "Forense", "Móvil"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Lo-Fi",
     "dificultad": "Fácil",
-    "tipo": ["Pentesting"]
+    "tipo": ["Pentesting"],
+    "ruta": "./rooms/#"
   },
   {
     "nombre": "Security Footage",
     "dificultad": "Media",
-    "tipo": ["Forense"]
+    "tipo": ["Forense"],
+    "ruta": "./rooms/#"
   }
 ]

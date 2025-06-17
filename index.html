@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador con Botones</title>
+  <title>Rooms Log4Nico</title>
   <style>
     body {
       font-family: serif;
       background-color: #00060e;
-      color: #f0f0f0;
       height: 100vh;
       margin: 0;
+      color: white;
       background-image: url('assets/log4nico.png');
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -67,7 +67,7 @@
       background-color: limegreen;
       border: none;
       border-radius: 6px;
-      color: #fff;
+      color: #000;
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -108,13 +108,13 @@
       transform: scale(1.02);
     }
 
-    .maquina h3 {
+    .maquina h2 {
       margin: 0;
       color: limegreen;
     }
 
     .maquina p {
-      font-size: 14px;
+      font-size: 16px;
       margin-top: 5px;
       color: #ccc;
     }
@@ -167,6 +167,7 @@
       const nombre = m.nombre || "Sin nombre";
       const tipo = m.tipo || "Desconocido";
       const dificultad = m.dificultad || "No indicada";
+      const ruta = m.ruta || "#";
 
       // Determinar color según la dificultad
       let bgColor = "#1c1c1c"; // por defecto
@@ -185,9 +186,16 @@
       const div = document.createElement("div");
       div.classList.add("maquina");
       div.style.backgroundColor = bgColor;
+      div.style.cursor = "pointer";
+      div.title = `Ir a: ${ruta}`;
+
+      // Al hacer clic, ir a la ruta
+      div.addEventListener("click", () => {
+        window.location.href = ruta;
+      });
 
       div.innerHTML = `
-        <h3>${nombre}</h3>
+        <h2>${nombre}</h2>
         <p>Tipo: ${tipo}</p>
         <p>Dificultad: ${dificultad}</p>
       `;

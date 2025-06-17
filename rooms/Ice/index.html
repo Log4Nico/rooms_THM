@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ice - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ice</h1>
+    <div class="section">
+      <h2>Proceso</h2>
+      <p>Empezamos el análisis con un escaneo simple de los puertos:</p>
+      <img src="img/image-4.png" alt="Escaneo de puertos">
+      <blockquote>Encontramos 6 puertos con servicios conocidos.</blockquote>
+
+      <p>La página nos pregunta, ¿cuál es el puerto asociado al servicio Microsoft Remote Desktop (MSRDP)?</p>
+      <img src="img/image.png" alt="Puertos y servicios">
+
+      <p>Veamos ahora el servicio activo en el puerto 8000:</p>
+      <img src="img/image-5.png" alt="Icecast en 8000">
+      <blockquote>icecast (un servidor de transmisión de video y audio)</blockquote>
+
+      <p>¿Cuál es el hostname de la máquina objetivo?</p>
+      <img src="img/image-2.png" alt="Hostname">
+      <blockquote>Podemos ver el hostname con -A -T4</blockquote>
+
+      <p>Sabiendo el servicio instalado en el puerto 8000, podemos buscar información del CVE asociado y de su peligrosidad.</p>
+      <img src="img/image-3.png" alt="CVE Icecast">
+      <blockquote>Si le preguntamos a chatGPT, nos dice que está asociado al cve CVE-2004-1561 y la peligrosidad es de 6.4</blockquote>
+
+      <p>Si buscamos el servicio en metasploit, sacamos el siguiente exploit:</p>
+      <img src="img/image-6.png" alt="Exploit Icecast">
+      <blockquote>exploit/windows/http/icecast_header</blockquote>
+
+      <p>Usando ese exploit, y mostrando las opciones, podemos ver cuáles son las requeridas por el exploit:</p>
+      <img src="img/image-7.png" alt="Opciones exploit">
+
+      <p>Cambiamos el RHOST y el LHOST por los necesarios, e iniciamos el exploit:</p>
+      <img src="img/image-9.png" alt="Set RHOST">
+      <img src="img/image-10.png" alt="Set LHOST">
+
+      <p>Ya estaríamos dentro del sistema, vamos a ver que encontramos:</p>
+      <img src="img/image-11.png" alt="Meterpreter shell">
+      <img src="img/image-37.png" alt="Comandos meterpreter">
+
+      <p>Vamos a listar los procesos activos y ver qué usuario está usando icecast:</p>
+      <img src="img/image-12.png" alt="Procesos activos">
+      <blockquote>El proceso de la imagen no es el que pide el enunciado</blockquote>
+
+      <p>Ver la build del sistema operativo:</p>
+      <img src="img/image-13.png" alt="Build SO">
+
+      <p>Y la arquitectura de este:</p>
+      <img src="img/image-14.png" alt="Arquitectura SO">
+
+      <p>El creador de la room nos recomienda usar el siguiente post exploit:</p>
+      <img src="img/image-15.png" alt="Local exploit suggester">
+      <blockquote>run post/multi/recon/local_exploit_suggester</blockquote>
+
+      <p>El comando anterior nos proporcionará varios exploits que podemos usar para escalar privilegios. Para esta room usaremos el de la imagen:</p>
+      <img src="img/image-17.png" alt="Exploit bypassuac_eventvwr">
+      <blockquote>exploit/windows/local/bypassuac_eventvwr</blockquote>
+
+      <p>Ahora que hemos encontrado el exploit para escalar privilegios, enviamos la sesión al background:</p>
+      <img src="img/image-18.png" alt="Background session">
+
+      <p>Usamos el exploit anterior:</p>
+      <img src="img/image-21.png" alt="Usar exploit">
+
+      <p>Configuramos las opciones necesarias:</p>
+      <img src="img/image-20.png" alt="Opciones exploit">
+      <blockquote>La siguiente respuesta es: "LHOST"</blockquote>
+
+      <p>Y corremos el exploit:</p>
+      <img src="img/image-22.png" alt="Ejecutar exploit">
+
+      <p>En la nueva shell, podemos usar <code>getprivs</code> para ver los privilegios que tenemos:</p>
+      <img src="img/image-23.png" alt="getprivs">
+
+      <p>Y listar los procesos con <code>ps</code>:</p>
+      <img src="img/image-24.png" alt="ps">
+
+      <p>Vamos a intentar sacar las contraseñas de los usuarios. Cambiamos nuestro proceso a otro del usuario NT AUTHORITY\SYSTEM:</p>
+      <img src="img/image-25.png" alt="Cambiar proceso">
+      <img src="img/image-26.png" alt="Cambiar proceso 2">
+      <img src="img/image-27.png" alt="Cambiar proceso 3">
+
+      <p>Vamos a utilizar una nueva herramienta <code>kiwi</code>, con la que sacaremos los hashes de todos los usuarios de la máquina:</p>
+      <img src="img/image-28.png" alt="kiwi">
+
+      <p>Con este comando, podemos sacar los hashes de los usuarios:</p>
+      <img src="img/image-29.png" alt="hashes usuarios">
+      <img src="img/image-30.png" alt="hashdump">
+      <blockquote>No me funciona creds_all, lo hago con hashdump</blockquote>
+
+      <p>Crackeamos las contraseñas con john the reaper:</p>
+      <img src="img/image-31.png" alt="john the reaper">
+
+      <p>Por último, algunos comandos de kiwi bastante interesantes:</p>
+      <ul>
+        <li>Ver la pantalla del usuario: <img src="img/image-32.png" alt="pantalla usuario"></li>
+        <li>Grabar el micrófono del sistema: <img src="img/image-33.png" alt="micrófono"></li>
+        <li>Modificar la MAC de los archivos: <img src="img/image-34.png" alt="MAC archivos"></li>
+        <li>Autenticarnos donde queramos: <img src="img/image-35.png" alt="autenticación"></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

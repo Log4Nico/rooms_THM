@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pickle Rick - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pickle Rick</h1>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis escaneando los puertos de la máquina:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Tenemos 2 puertos abiertos, el <strong>22</strong> con ssh y el <strong>80</strong> con apache. Si nos metemos en la página web:</p>
+      <img src="img/image-1.png" alt="Página principal">
+      <img src="img/image-2.png" alt="Página insegura">
+      <blockquote>Veremos que no es muy segura.</blockquote>
+
+      <p>Mientras el fuzzeo se hace, probamos los típicos directorios:</p>
+      <img src="img/image-3.png" alt="Directorio especial">
+      <blockquote>Wubbalubbadubdub</blockquote>
+
+      <img src="img/image-4.png" alt="Directorio login">
+
+      <p><code>/portal.php</code> y <code>/login.php</code> parecen ser el mismo directorio:</p>
+      <img src="img/image-5.png" alt="Login portal">
+
+      <p>Tenemos un usuario, y algo que podemos usar como contraseña:</p>
+      <img src="img/image-6.png" alt="Credenciales">
+      <blockquote>Funcionaron.</blockquote>
+
+      <p>Parece ser una consola que ejecuta comandos en el servidor:</p>
+      <img src="img/image-7.png" alt="Consola comandos">
+
+      <p>Hagamos una búsqueda sencilla de algo útil:</p>
+      <img src="img/image-8.png" alt="Búsqueda ingrediente 1">
+      <img src="img/image-9.png" alt="Ingrediente 1">
+      <blockquote>cat no funciona en esta terminal, pero less si. Primer ingrediente.</blockquote>
+
+      <img src="img/image-10.png" alt="Búsqueda ingrediente 2">
+      <img src="img/image-11.png" alt="Ingrediente 2">
+      <blockquote>Segundo ingrediente.</blockquote>
+
+      <p>Lo más seguro es que el último ingrediente esté en <code>/root</code>, y lo mejor sería hacerlo desde una terminal en condiciones.</p>
+      <img src="img/image-12.png" alt="Preparar reverse shell">
+
+      <p>En el servidor está instalado php, por lo que podríamos hacer una reverse shell. En <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md" target="_blank">Payload All The Things</a> podemos encontrar el siguiente comando para crearnos una reverse shell:</p>
+      <img src="img/image-13.png" alt="Reverse shell payload">
+      <blockquote>Tenemos que cambiar la IP (poner la nuestra del túnel) y el puerto solamente si queremos.</blockquote>
+
+      <img src="img/image-14.png" alt="Reverse shell lanzada">
+      <img src="img/image-15.png" alt="Shell mejorada">
+
+      <p>Ahora podremos trabajar mejor. Hagamos un escalado de privilegios, primero vemos los permisos que tiene el usuario: <pre>www-data</pre></p>
+      <img src="img/image-16.png" alt="Permisos www-data">
+      <blockquote>Tiene todos los permisos.</blockquote>
+
+      <p>Iniciamos sesión con root directamente y vemos su directorio:</p>
+      <img src="img/image-17.png" alt="Ingrediente final">
+      <blockquote>Último ingrediente.</blockquote>
+    </div>
+  </div>
+</body>
+</html>

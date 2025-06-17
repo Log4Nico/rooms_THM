@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Library - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Library</h1>
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos con lo más obvio, un análisis de los puertos abiertos:</p>
+      <img src="img/image-1.png" alt="Escaneo de puertos">
+
+      <p>Encontramos abiertos los puertos <strong>22</strong> (OpenSSH 7.2p2 Ubuntu 4ubuntu2.8) y <strong>80</strong> (Apache httpd 2.4.18).</p>
+      <p>Dejamos de lado el puerto 22 de momento y nos centramos en la página web:</p>
+      <img src="img/image-2.png" alt="Página web principal">
+      <img src="img/image-3.png" alt="Posibles usuarios">
+      <blockquote>3 posibles usuarios.</blockquote>
+
+      <p>Hacemos un fuzzeo de la página:</p>
+      <blockquote>El menú de arriba no sirve.</blockquote>
+      <img src="img/image-4.png" alt="Fuzzing directorios">
+      <blockquote>No está encontrando nada...</blockquote>
+
+      <p>En el <code>/robots.txt</code>, encontramos esto:</p>
+      <img src="img/image-5.png" alt="robots.txt">
+      <blockquote>Puede que tengamos que hacer fuerza bruta.</blockquote>
+      <img src="img/image-6.png" alt="Nuevo posible usuario">
+      <blockquote>Otro posible usuario.</blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Fuerza Bruta de Credenciales</h2>
+      <p>Como no puedo mirar más cosas, hago fuerza bruta con el ssh.</p>
+      <img src="img/image-7.png" alt="Hydra fuerza bruta">
+
+    </div>
+
+    <div class="section">
+      <h2>Acceso y Primera Flag</h2>
+      <p>Ahora que tenemos un usuario y una contraseña, vamos a loguearnos:</p>
+      <img src="img/image-8.png" alt="SSH login">
+      <img src="img/image-9.png" alt="Primera flag">
+      <blockquote class="flag">Primera flag encontrada.</blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Escalada de Privilegios</h2>
+      <p>Hora de escalar privilegios:</p>
+      <img src="img/image-10.png" alt="sudo -l">
+      <p>El usuario puede ejecutar como root el archivo <code>.py</code> de su directorio:</p>
+      <img src="img/image-11.png" alt="Script backup.py">
+      <blockquote>El script crea una copia de seguridad del directorio <code>/var/www/html</code>.</blockquote>
+
+      <p>Podríamos intentar cambiar el contenido del archivo para ejecutar lo que queramos, pero antes debemos borrar el archivo y crearnos uno nuevo, ya que no podemos editarlo:</p>
+      <img src="img/image-12.png" alt="Borrar backup.py">
+      <p>Y creamos un archivo con el mismo nombre y con el siguiente contenido:</p>
+      <img src="img/image-13.png" alt="Nuevo backup.py">
+
+      <p>Ejecutamos el script:</p>
+      <img src="img/image-14.png" alt="Ejecución backup.py">
+      <blockquote>No sé por qué solo funciona con el último comando.</blockquote>
+      <img src="img/image-15.png" alt="Root flag">
+      <blockquote class="flag">Conseguimos la última flag.</blockquote>
+    </div>
+  </div>
+</body>
+</html>

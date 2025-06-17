@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sudo Agent - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+        color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sudo Agent</h1>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Como ya es tradición, empezamos el análisis con un escaneo de puertos a la máquina para ver posibles vectores:</p>
+      <pre><code>sudo nmap -Pn -A -T4 10.10.139.140</code></pre>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Encontramos 3 servicios: ftp(21), ssh(22) y http(80). Meternos ahora con alguno de los primeros es mucho lío, vamos a ver que hay en la página web:</p>
+      <img src="img/image-1.png" alt="Página web">
+
+      <p>Parece que vamos a tener que cambiar nuestro <em>user agent</em> para poder ver contenido en la página pero, <em>¿a cuál lo cambiamos?</em></p>
+
+      <p>En la página pone <strong>Agent R</strong>, por lo que podríamos intentar con este:</p>
+      <img src="img/image-2.png" alt="Agent R">
+
+      <p>Parece que funciona, voy a probar con las 24 letras restantes:</p>
+      <img src="img/image-3.png" alt="Prueba con letras restantes">
+
+      <p>Solo encuentro eso, para la próxima, se puede usar un comando <code>curl</code> para hacer este proceso más ligero:</p>
+      <pre><code>curl "http://10.10.139.140/" -H "User-Agent: C" -L</code></pre>
+
+      <p>Encontramos el siguiente mensaje:</p>
+      <blockquote>
+        Atención chris,<br>
+        ¿Todavía recuerdas nuestro trato? Por favor, dígale al agente J sobre las cosas ASAP(As Soon As Possible?). Además, cambia tu maldita contraseña, ¡es débil!
+      </blockquote>
+
+      <p>No se muy bien a que se refiere con cosas, pero tenemos un usuario y una contraseña débil, ahora si, podríamos intentar fuerza bruta a los servicios anteriores.</p>
+
+      <p>Empecemos con el FTP:</p>
+      <img src="img/image-4.png" alt="FTP acceso">
+
+      <p>Ya tenemos la contraseña del usuario para el FTP, y dentro de este encontramos:</p>
+      <img src="img/image-5.png" alt="Archivos en FTP">
+
+      <p>Voy a analizar todos estos archivos en busca de información(parecen retos ctfs jaja).</p>
+      <img src="img/image-6.png" alt="Archivos CTF">
+
+      <p>A esto se referían con cosas(?), la contraseña del agente <em>J</em> se encuentra en las imágenes que hemos encontrado. Vamos a usar herramientas de forense de imagen:</p>
+      <ul>
+        <li>exiftool = nada</li>
+        <li>steghide</li>
+      </ul>
+
+      <img src="img/image-12.png" alt="Steghide">
+      <blockquote>Parece que hay algo en cute-alien.jpg, pero necesito la contraseña.</blockquote>
+
+      <p>binwalk</p>
+      <img src="img/image-7.png" alt="Binwalk">
+
+      <p>Encontramos lo que parece un archivo <em>ZIP</em> oculto en él, vamos a comprobarlo:</p>
+      <img src="img/image-8.png" alt="Archivo ZIP oculto">
+      <blockquote>El ZIP está protegido con contraseña.</blockquote>
+
+      <p>Parece un reto ctf, por lo que seguro que la contraseña está por aquí.</p>
+      <p>Pues... no, probamos con John.</p>
+
+      <img src="img/image-9.png" alt="John the Ripper">
+      <img src="img/image-10.png" alt="John the Ripper cracking">
+      <img src="img/image-11.png" alt="John the Ripper cracking">
+
+      <p>Podría ser la contraseña del steghide:</p>
+      <img src="img/image-13.png" alt="Contraseña steghide encontrada">
+      <blockquote>Encontramos un nuevo usuario y su contraseña.</blockquote>
+
+      <p>El mensaje habla de <em>login</em> por lo que voy a asumir que se trata de las credenciales del <em>ssh</em>.</p>
+
+      <img src="img/image-14.png" alt="Login SSH">
+
+      <p>Ya estaríamos dentro del sistema, ahora solo tenemos que escalar privilegios.</p>
+
+      <p>En el escritorio del usuario, encontramos un archivo jpg que no podemos abrir, voy a pasarlo a mi máquina con <code>scp</code>:</p>
+      <img src="img/image-15.png" alt="Archivo jpg en escritorio">
+      <blockquote>Aclarar que esto no es lo más ideal(porque dejamos una huella importante), pero si lo más rápido.</blockquote>
+
+      <img src="img/image-16.png" alt="Archivo jpg en máquina local">
+      <blockquote>La pregunta de THM dice como se llama el incidente de esta foto.</blockquote>
+
+      <p>Ahora que tenemos acceso a la máquina, tenemos que escalar privilegios. Empecemos viendo los permisos que tiene el usuario:</p>
+      <img src="img/image-18.png" alt="Permisos usuario">
+      <blockquote>Un poco raro.</blockquote>
+
+      <p>Si buscamos <code>(ALL, !root) /bin/bash</code> en internet, encontramos la siguiente entrada de <a href="https://www.exploit-db.com/exploits/47502" target="_blank" rel="noopener noreferrer">exploitdb</a>. Parece que se puede explotar poniendo lo siguiente:</p>
+      <img src="img/image-19.png" alt="Exploit">
+      <blockquote>La informática es un mundo maravilloso.</blockquote>
+    </div>
+  </div>
+</body>
+</html>

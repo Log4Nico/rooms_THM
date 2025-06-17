@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Poster - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Poster</h1>
+    <p><em>The sys admin set up a rdbms in a safe way.</em></p>
+    <pre>RDBMS = Sistema de Gestión de Bases de Datos Relacional.</pre>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis con un escaneo de puertos con nmap:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Encontramos los puertos 22 y 80 típicos y uno nuevo hasta ahora, el puerto 5432 que corresponde al servicio postgresSQL.</p>
+
+      <p>Podríamos usar <code>Metasploit</code> para buscar algún exploit que nos permita acceder a información relevante:</p>
+      <img src="img/image-1.png" alt="Módulo Metasploit enum">
+
+      <p>Este módulo nos permite enumerar las credenciales de los usuarios, vamos a ver qué resultado nos da:</p>
+      <img src="img/image-2.png" alt="Credenciales encontradas">
+
+      <p>Nos da este resultado. Ahora que tenemos el usuario y la contraseña, vamos a buscar otro módulo que nos permita hacer algo más:</p>
+      <img src="img/image-3.png" alt="Módulo ejecutar querys">
+
+      <p>Como se ve en la siguiente foto, podemos ejecutar querys en la base de datos:</p>
+      <img src="img/image-4.png" alt="Ejecución de querys">
+
+      <p>Busquemos algo para el hash de los usuarios:</p>
+      <img src="img/image-5.png" alt="Hash usuarios">
+      <img src="img/image-6.png" alt="Hash usuarios 2">
+
+      <p>Ahora uno que nos permita leer archivos del servidor:</p>
+      <img src="img/image-7.png" alt="Leer archivos">
+      <img src="img/image-8.png" alt="Leer archivos 2">
+
+      <p>Podemos leer los archivos del sistema, obviamente, los que no estén protegidos, además, el creador de la máquina nos ha puesto un archivo para que lo veamos también:</p>
+      <img src="img/image-9.png" alt="Archivo especial">
+
+      <p>Tenemos un nuevo usuario y una contraseña.</p>
+
+      <p>Y por último, un exploit que permita ejecutar código arbitrario:</p>
+      <img src="img/image-10.png" alt="Ejecutar código arbitrario">
+      <img src="img/image-11.png" alt="Ejecutar código arbitrario 2">
+
+      <p>Hemos iniciado sesión en la máquina con el usuario <span class="flag">postgress</span>:</p>
+      <img src="img/image-12.png" alt="Sesión postgress">
+
+      <p>Ahora tenemos que escalar privilegios, antes encontramos unas credenciales:</p>
+      <img src="img/image-13.png" alt="Credenciales adicionales">
+      <blockquote>No es necesario hacerlo desde el Metasploit.</blockquote>
+
+      <p>Y ahora sí que sí, escalamos privilegios.</p>
+      <img src="img/image-14.png" alt="Escalada de privilegios">
+
+      <p>Dark no puede ejecutar sudo con nada y no existe ningún binario vulnerable con SUID. Vemos que existe un usuario <em>alison</em>. Entiendo que la contraseña estará guardada en el sistema de alguna forma, voy a usar un <code>find</code> para encontrar algo relevante:</p>
+      <p>Lo único interesante fue esto:</p>
+      <img src="img/image-15.png" alt="Archivo interesante">
+      <p>Cuyo contenido es:</p>
+      <img src="img/image-16.png" alt="Contenido archivo">
+
+      <p>Iniciamos sesión con <em>alison</em> ahora y vemos sus permisos:</p>
+      <img src="img/image-17.png" alt="Permisos alison">
+
+      <p>Alison puede hacer <code>sudo</code> con todo, iniciamos sesión con root y ya habríamos terminado.</p>
+    </div>
+  </div>
+</body>
+</html>

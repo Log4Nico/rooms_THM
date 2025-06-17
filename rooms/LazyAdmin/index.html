@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LazyAdmin - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LazyAdmin</h1>
+    <p><em>Easy linux machine to practice your skills</em></p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Como siempre, empezamos el análisis con un escaneo de puertos, y sacamos los siguientes puertos:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Dejamos el ssh apartado y nos centramos en el <code>apache</code>:</p>
+      <img src="img/image-1.png" alt="Página principal Apache">
+
+      <p>Hacemos un gobuster para buscar directorios ocultos:</p>
+      <img src="img/image-2.png" alt="Gobuster 1">
+      <img src="img/image-3.png" alt="Gobuster 2">
+
+      <p>Con este segundo <code>gobuster</code> encontramos un <code>login</code> y en el directorio <em>/inc</em> un backup de <em>mysql</em>:</p>
+      <img src="img/image-4.png" alt="Backup mysql encontrado">
+      <img src="img/image-5.png" alt="Contenido backup">
+
+      <p>En este backup se encuentran varias cosas como posibles nombres de usuario y un claro hash:</p>
+      <img src="img/image-6.png" alt="Hash backup">
+      <blockquote>Si john falla siempre uso hashcat.</blockquote>
+      <img src="img/image-7.png" alt="Usuario manager encontrado">
+      <blockquote>El usuario es manager.</blockquote>
+      <img src="img/image-8.png" alt="Login manager">
+      <img src="img/image-9.png" alt="Panel admin">
+
+      <p>Como somos <em>admin</em> podemos subir archivos a la página, así que subimos una reverseshell:</p>
+      <img src="img/image-10.png" alt="Reverse shell subida">
+
+      <p>Ya estamos dentro del sistema, ahora toca escalar privilegios.</p>
+      <img src="img/image-11.png" alt="Privilegios perl">
+
+      <p>Este usuario puede ejecutar <code>perl</code> con permisos de administrador. En la siguiente <a href="https://gtfobins.github.io/gtfobins/perl/#sudo" target="_blank">entrada de GTFOBins</a> nos enseñan cómo hacerlo:</p>
+      <img src="img/image-12.png" alt="GTFOBins perl sudo">
+
+      <p>Necesitamos tener una shell con TTY válido...</p>
+      <p>Probamos con el siguiente ejecutable:</p>
+      <img src="img/image-13.png" alt="backup.pl ejecutable">
+      <img src="img/image-14.png" alt="Permisos copy.sh">
+
+      <p>Parece que, aunque el archivo <code>copy.sh</code> sea del <em>root</em>, tenemos permisos para editarlo, o sea:</p>
+      <pre>
+www-data -> Puede ejecutar con sudo -> /home/itguy/backup.pl
+
+backup.pl -> Ejecuta como administrador -> /etc/copy.sh
+
+copy.sh -> Puede ser editado por -> Cualquiera.
+      </pre>
+
+      <p>Aprovechamos esto para crear una reverseshell:</p>
+      <img src="img/image-15.png" alt="Reverse shell root">
+
+      <p>Pues ya habríamos acabado la máquina.</p>
+    </div>
+  </div>
+</body>
+</html>

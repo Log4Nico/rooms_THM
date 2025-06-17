@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>StartUp - Writeup TryHackMe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>StartUp</h1>
+    <p><em>Abuse traditional vulnerabilities via untraditional means.</em></p>
+    <p>Esta room nos pide 3 cosas: iniciar sesión como usuario, escalar privilegios y encontrar la receta secreta.</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis haciendo un escaneo de los puertos abiertos de la máquina con <code>nmap</code>:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>El escaneo indica:</p>
+      <ul>
+        <li>FTP con acceso anónimo</li>
+        <li>Servidor SSH</li>
+        <li>Servidor web</li>
+      </ul>
+
+      <h3>FTP</h3>
+      <img src="img/image-1.png" alt="FTP acceso">
+      <img src="img/image-2.png" alt="Permisos 777">
+      <blockquote>La carpeta <em>ftp</em> tiene permisos 777, por lo que podríamos subir algo nosotros.</blockquote>
+      <img src="img/image-3.png" alt="Memes Among Us">
+      <blockquote>
+        Al que esté dejando estos malditos memes de Among Us en esta carpeta, NO ES GRACIOSO. La gente que descarga documentos de nuestro sitio web pensará que estamos de broma. Yo no sé quién fue, pero Maya está buscando.
+      </blockquote>
+      <p>Tenemos un nombre, <strong>Maya</strong>. La foto parece sospechosa, pero no se obtiene nada relevante con análisis forense.</p>
+
+      <h3>Web</h3>
+      <img src="img/image-5.png" alt="Página web principal">
+      <img src="img/image-6.png" alt="Dirbuster web">
+      <p>El dirbuster nos lleva a la carpeta del FTP. Como la carpeta tiene permisos 777 y es accesible desde el navegador, se puede subir una reverse shell PHP y ejecutarla desde la web.</p>
+      <img src="img/image-7.png" alt="Subida reverse shell">
+      <img src="img/image-8.png" alt="Ejecución reverse shell">
+
+      <p>Ya dentro del sistema, cambiamos de <code>sh</code> a <code>bash</code> para una shell más cómoda:</p>
+      <blockquote>Con <code>bash -i</code> cambiamos de <em>sh</em> a <em>bash</em>.</blockquote>
+      <img src="img/image-9.png" alt="Shell bash">
+
+      <p>Aparecemos en la raíz del sistema, donde encontramos una carpeta <code>incidents</code> y la <strong>receta secreta</strong>:</p>
+      <img src="img/image-10.png" alt="Receta y incidents">
+
+      <h3>Análisis de la evidencia</h3>
+      <p>En la carpeta <code>incidents</code> hay un archivo <code>.pcapng</code>. Para extraerlo, lo copiamos a la carpeta del FTP para descargarlo vía web:</p>
+      <img src="img/image-11.png" alt="Permisos carpeta">
+      <img src="img/image-12.png" alt="Descarga pcapng">
+
+      <p>Analizando el archivo con Wireshark, siguiendo la secuencia TCP número 7, encontramos un log con credenciales filtradas:</p>
+      <img src="img/image-13.png" alt="Wireshark secuencia TCP">
+      <blockquote>
+        Al hacer click derecho en cualquier paquete TCP, darle a "seguir secuencia TCP" y poner 7 en secuencia, conseguimos una especie de log.
+      </blockquote>
+      <img src="img/image-14.png" alt="Credenciales encontradas">
+
+      <p>Probamos las credenciales por SSH:</p>
+      <img src="img/image-15.png" alt="Login SSH">
+      <blockquote>Perfecto, ya solo queda iniciar sesión como <strong>root</strong>.</blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Escalada de Privilegios</h2>
+      <img src="img/image-16.png" alt="Permisos lennie">
+      <blockquote>lennie no tiene permisos de admin en esta máquina.</blockquote>
+      <img src="img/image-17.png" alt="Archivos extraños">
+      <p>En el directorio de <em>lennie</em> encontramos archivos y carpetas sospechosas.</p>
+      <img src="img/image-18.png" alt="Carpeta scripts">
+      <blockquote>En la carpeta <em>scripts</em> hay un <code>.sh</code> que vuelca el contenido de una variable a un archivo y ejecuta un script del usuario lennie. Por la hora de modificación, parece que se actualiza cada minuto.</blockquote>
+      <img src="img/image-19.png" alt="Script cron">
+
+      <p>Editamos el archivo que ejecuta el script y creamos una reverse shell para obtener acceso root:</p>
+      <img src="img/image-20.png" alt="Reverse shell root">
+      <img src="img/image-21.png" alt="Root shell obtenida">
+
+      <blockquote>Nos hemos aprovechado de una vulnerabilidad de automatización (probablemente cron) para escalar privilegios en el sistema.</blockquote>
+    </div>
+  </div>
+</body>
+</html>

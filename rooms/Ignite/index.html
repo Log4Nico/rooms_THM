@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ignite - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ignite</h1>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis con un escaneo de puertos:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Encontramos el puerto 80 abierto con servicio Apache httpd 2.4.18 en él.</p>
+      <p>Si analizamos la web, encontramos esto en la portada:</p>
+      <img src="img/image-1.png" alt="Fuel CMS 1.4">
+      <blockquote>Fuel CMS 1.4</blockquote>
+
+      <p>Con esta información, podemos buscar algún exploit para este tipo de CMS:</p>
+      <img src="img/image-2.png" alt="Exploit Fuel CMS">
+      <blockquote>Encontramos varios exploits disponibles para hacer una misma cosa, los probamos todos.</blockquote>
+
+      <p>Ejecutamos el siguiente exploit:</p>
+      <img src="img/image-3.png" alt="Exploit ejecutado">
+      <blockquote>Si pone <code>Enter Command $</code> el exploit habrá funcionado.</blockquote>
+
+      <p>Ahora mismo estamos dentro del sistema con el usuario <span class="flag">www-data</span>, usuario por defecto de los sistemas apache.</p>
+      <p>Encontramos la primera flag:</p>
+      <img src="img/image-4.png" alt="Primera flag">
+
+      <p>Ahora tendremos que escalar privilegios, pero primero, vamos a mejorar la shell instalando una reverse shell en el servidor.</p>
+      <p>Lo primero que haremos es descargarnos la siguiente <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank">reverse shell</a>.</p>
+      <p>Modificamos los siguientes parámetros:</p>
+      <img src="img/image-5.png" alt="Configurar reverse shell">
+      <blockquote>Ponemos nuestra IP del túnel y un puerto que queramos poner en escucha en nuestra máquina.</blockquote>
+
+      <p>Ahora tenemos que abrir un servidor en nuestra máquina con la que podamos entrar desde el servidor:</p>
+      <img src="img/image-6.png" alt="Servidor local">
+
+      <p>Desde la terminal que conseguimos antes, hacemos un <code>wget</code> al archivo:</p>
+      <img src="img/image-7.png" alt="wget reverse shell">
+
+      <p>Perfecto, ahora que lo tenemos instalado en el servidor, podemos cerrar el python, y tenemos que poner un puerto en escucha con <pre>nc -lvp 1234</pre></p>
+
+      <p>Lo dejamos ahí, y en el navegador, tenemos que acceder a ese archivo:<br>
+      <pre>http://{ip_host}/php-reverse-shell.php</pre>
+      <blockquote>Recomiendo cambiar el nombre del archivo antes de subirlo...</blockquote>
+      <img src="img/image-8.png" alt="Reverse shell activa">
+      <blockquote>Ya estaríamos dentro de la máquina, pero parece un /bin/sh raro.</blockquote>
+
+      <p>Mejoramos la shell con el siguiente comando:</p>
+      <pre><code>python3 -c 'import pty;pty.spawn("/bin/bash")'</code></pre>
+      <p>De esta forma tenemos una shell mucho más cómoda y fácil de usar que la anterior.</p>
+
+      <p>Recordemos que en el servidor hay un CMS instalado, por lo que probablemente haya una base de datos en el sistema. Hacemos una búsqueda de algún archivo que nos pueda ayudar:</p>
+      <pre><code>find /var -type f -iname "*database*" 2>/dev/null</code></pre>
+      <blockquote>Esto buscará todos los archivos que contengan la palabra <em>database</em> en la carpeta <em>/var</em>.</blockquote>
+      <img src="img/image-9.png" alt="Buscar database">
+      <img src="img/image-10.png" alt="Contraseña root encontrada">
+      <blockquote>Encontramos que el usuario <span class="flag">root</span> tiene la contraseña <span class="flag">mememe</span>.</blockquote>
+
+      <p>Iniciamos sesión con <code>su root</code>, ponemos la contraseña <code>mememe</code> y ya estaría:</p>
+      <img src="img/image-11.png" alt="Shell root">
+
+      <p>Encontramos también la root flag:</p>
+      <img src="img/image-12.png" alt="Root flag">
+    </div>
+  </div>
+</body>
+</html>

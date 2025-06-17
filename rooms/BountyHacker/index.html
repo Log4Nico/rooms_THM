@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bounty Hacker - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+        color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bounty Hacker</h1>
+    <p><em>You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!</em></p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos con un escaneo de puertos:</p>
+      <img src="img/image.png" alt="Escaneo inicial">
+      <img src="img/image-1.png" alt="Puertos abiertos">
+
+      <p>En el puerto 80, encontramos una conversación de los tripulantes de la nave:</p>
+      <pre>Spike, Jet, Ed y Faye están hablando con nosotros.
+        Spike lo despierta de mala gana.
+        Jet le recuerda que se ofreció para hackear cualquier sistema y ahora debe demostrarlo, ya que Ed está ocupada con otra cosa.
+        Ed se presenta alegremente y menciona que el dispositivo ya está accesible desde el ordenador del nuevo.
+        Faye solo suelta un "hmph", como siempre, con actitud.
+        Jet incluso promete hacer pimientos con carne como recompensa si todo sale bien.
+      </pre>
+      
+
+      <p>Probamos a logearnos de manera anónima en el sistema usando ftp:</p>
+      <img src="img/image-2.png" alt="Gobuster inicial">
+      <img src="img/image-4.png" alt="Rockyou.txt">
+
+      <blockquote>Funciona!! Solo había que esperar un poquito.</blockquote>
+      <img src="img/image-5.png" alt="Hydra config">
+
+      <p>Ahora si, un ataque de fuerza bruto es factible:</p>
+      <img src="img/image-6.png" alt="Credenciales obtenidas">
+      <blockquote>Contraseña encontrada: <span class="flag">RedDr4gonSynd1cat3</span></blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Escalada de Privilegios</h2>
+      <p>Vemos que puede ejecutar lin con sudo:</p>
+      <img src="img/image-7.png" alt="sudo -l">
+      <blockquote>El usuario puede ejecutar <code>tar</code> como root</blockquote>
+
+      <p>Explotación usando GTFOBins:(No se porqué censuré parte de las imágenes)</p>
+      <img src="img/image-8.png" alt="GTFOBins referencia">
+      <pre><code>sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh</code></pre>
+      <img src="img/image-9.png" alt="Shell root">
+      <blockquote class="flag">¡Obtenido acceso root!</blockquote>
+    </div>
+  </div>
+</body>
+</html>

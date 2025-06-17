@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bolt - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+        color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bolt</h1>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empecemos escaneando los puertos de la máquina, para no tardar tanto, lo haré de los siguientes puertos:</p>
+      <img src="./img/image-1.png" alt="Escaneo inicial">
+      <ul>
+        <li><strong>22</strong>: SSH (no lo vamos a tocar)</li>
+        <li><strong>80</strong>: Apache por defecto (sin contenido)</li>
+        <li><strong>8000</strong>: Aplicación real</li>
+      </ul>
+      <blockquote>¿En qué puerto está alojado el servidor web con el CMS? <span class="flag">8000</span></blockquote>
+
+      <img src="./img/image-2.png" alt="CMS Bolt">
+      <p>Buscamdo por la página, encontramos varias cosas de interes:</p>
+      <img src="./img/image-3.png" alt="Interfaz Bolt">
+      <pre>Un usuario admin <b>jake</b> y una contraseña <b>boltadmin123</b></pre>
+      <img src="./img/image-4.png" alt="Configuración CMS">
+      <pre>Encontramos también otro usuario <b>bolt</b></pre>
+
+      <blockquote>
+        ¿Qué usuario se puede encontrar en el CMS? <span class="flag">bolt</span><br>
+        ¿Cuál es la contraseña del usuario encontrado? <span class="flag">boltadmin123</span>
+      </blockquote>
+
+      <p>Wappalyzer nos confirma algo que ya sabíamos, la aplicación usa el CMS Bolt</p>
+      <img src="./img/image-5.png" alt="Credenciales">
+
+      <p>buscamos información relevante del cms y encontramos una página de login:</p>
+      <img src="./img/image-6.png" alt="Documentación Bolt">
+
+      <p>Con las credenciales que encontramos, inciamos sesión</p>
+      <img src="./img/image-7.png" alt="Login panel">
+      <img src="./img/image-8.png" alt="Dashboard admin">
+
+      <blockquote>¿Cuál es la versión del CMS instalado en el servidor? <span class="flag">Bolt 3.7.1</span></blockquote>
+      <img src="./img/image-9.png" alt="Versión CMS">
+      <blockquote>¿Cuál es el nombre del archivo capaz de hacerle exploit a esta versión? <span class="flag">48296</span></blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Explotación</h2>
+      
+      <p>Buscamos el exploit en Metasploit, si, se puede hacer con el archivo anterior pero msf me gusta más:</p>
+      <img src="./img/image-10.png" alt="Searchsploit">
+      <blockquote>Ruta completa del exploit: <span class="flag">exploit/unix/webapp/bolt_authenticated_rce</span></blockquote>
+
+      <p>Configuración del exploit:</p>
+      <img src="./img/image-11.png" alt="Configuración RHOST">
+      <img src="./img/image-12.png" alt="Configuración credenciales">
+      <pre>set RHOSTS [IP]
+set USERNAME bolt
+set PASSWORD boltadmin123</pre>
+
+      <p>Ejecutamos el exploit:</p>
+      <img src="./img/image-13.png" alt="Ejecución exploit">
+      <img src="./img/image-14.png" alt="Shell como root">
+      <blockquote>¡Obtenemos acceso root al servidor!</blockquote>
+    </div>
+  </div>
+</body>
+</html>

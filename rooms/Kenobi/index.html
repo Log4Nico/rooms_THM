@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Kenobi - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Kenobi</h1>
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos con un escaneo de todos los puertos y uno simple de servicios:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+      <img src="img/image-1.png" alt="Escaneo de servicios">
+
+      <p>¿Cosas a destacar? Vemos que existe un SMB en los puertos 139 y 445.</p>
+      <p>Podemos usar este comando para sacar un poco más de información y enumerar las carpetas compartidas:</p>
+      <pre><code>nmap -p 445 --script=smb-enum-shares.nse,smb-enum-users.nse {ip_target}</code></pre>
+      <img src="img/image-2.png" alt="Enum SMB">
+
+      <p>Vemos que podemos logearnos como anonymous, vamos a intentar conectarnos desde nuestro sistema:</p>
+      <img src="img/image-3.png" alt="SMB anonymous">
+
+      <p>Al listar los archivos, vemos que existe un archivo <code>log.txt</code>. Podemos descargarlo con <code>get log.txt</code>.</p>
+      <p>En el archivo podemos encontrar información relevante como:</p>
+      <ul>
+        <li>Claves SSG <img src="img/image-4.png" alt="Claves SSG"></li>
+        <li>Información sobre el servidor ProFTPD <img src="img/image-5.png" alt="ProFTPD info"></li>
+      </ul>
+      <blockquote>El servidor FTP se está ejecutando en el puerto 21</blockquote>
+
+      <p>Antes vimos que el puerto 111 estaba abierto con el servicio <strong>RCP</strong>. Vamos a sacar un poco más de información con el siguiente comando:</p>
+      <pre><code>nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount {ip_target}</code></pre>
+      <img src="img/image-6.png" alt="NFS enum">
+      <blockquote>Vemos que la aplicación tiene montado el directorio /var</blockquote>
+
+      <p>Sigamos viendo el servicio FTP y veamos qué versión de ProFTPD tiene instalado:</p>
+      <img src="img/image-7.png" alt="ProFTPD version">
+
+      <p>Es una versión bastante antigua del servicio, podemos buscar a ver si existe algún exploit para esta versión:</p>
+      <img src="img/image-8.png" alt="Exploit search">
+      <blockquote>Tiene 4 en total</blockquote>
+
+      <p>En el <code>log.txt</code>, vimos que existe un usuario <em>kenobi</em>, que lo podemos usar en el <strong>FTP</strong>.</p>
+      <img src="img/image-9.png" alt="FTP acceso">
+      <img src="img/image-10.png" alt="Copiar claves SSH">
+
+      <p>De esta forma, conseguimos copiar los archivos <em>key</em> de ssh de la otra máquina a nuestro <strong>PC</strong>. Nos la copiamos a nuestro directorio, le cambiamos los permisos e iniciamos sesión con ella por ssh:</p>
+      <img src="img/image-11.png" alt="SSH acceso kenobi">
+
+      <p>Sacamos la flag del usuario kenobi:</p>
+      <img src="img/image-12.png" alt="user.txt">
+      <blockquote class="flag">d0b0f3f53b6caa532a83915e19224899</blockquote>
+
+      <p>Intentemos ahora escalar privilegios. La máquina está preparada para escalar privilegios con permisos de los archivos. Vamos a buscar algún archivo con el SUID activado (esto permite que cualquier usuario pueda ejecutar el archivo con los mismos permisos que el creador de este). Vamos a buscar algún archivo con estas características:</p>
+      <pre><code>find / -perm -u=s -type f 2>/dev/null</code></pre>
+      <img src="img/image-14.png" alt="SUID files">
+
+      <p>El único destacable, al menos porque no me suena de nada, es <strong>menu</strong>, voy a ejecutarlo a ver qué pasa:</p>
+      <img src="img/image-15.png" alt="menu ejecutable">
+
+      <p>Parece que este <em>menu</em> está ejecutando los siguientes comandos:</p>
+      <img src="img/image-16.png" alt="Comandos menu">
+
+      <p>Ponemos los siguientes comandos en la terminal:</p>
+      <img src="img/image-17.png" alt="Preparar exploit">
+
+      <p>Esto básicamente está creando un <em>script</em> con el contenido <code>/bin/bash</code>, le da todos los permisos para que la aplicación <em>menu</em> lo pueda ejecutar, y exporta el directorio actual al PATH.</p>
+
+      <p>Y si ahora ejecutamos el <em>menu</em> y ponemos la opción 3:</p>
+      <img src="img/image-18.png" alt="Escalada menu">
+
+      <p>Somos root.</p>
+      <img src="img/image-19.png" alt="root.txt">
+    </div>
+  </div>
+</body>
+</html>

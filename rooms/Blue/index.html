@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blue - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Blue</h1>
+    <p>Esta máquina nos <em>guía</em> con las preguntas que nos hacen. Ha sido fácil de completar, quitando algunos errores que tenía la máquina (había que reiniciar y empezar de 0).</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis comprobando los 1000 puertos más habituales de la máquina</p>
+      <img src="img/image.png" alt="nmap escaneo básico">
+      <p>Este escaneo nos ha dado 4 puertos que podríamos mirar, y el resto con servicios desconocidos. Vemos cuales son vulnerables</p>
+      <p>Para ver esto, vamos a utilizar un script de nmap que busca vulnerabilidades en los servicios. Uso el mismo rango de antes porque entiendo que las preguntas están enlazadas.</p>
+      <img src="img/image-2.png" alt="nmap vuln">
+      <blockquote>nmap --script vuln -p 1-1000 {ip_host}</blockquote>
+      <p>El escaneo nos chiva que existe una vulnerabilidad en el servicio SMBv1 llamada <strong>ms17-010</strong></p>
+
+      <p>Buscamos la vulnerabilidad anterior en la base de datos de Metasploit</p>
+      <img src="img/image-4.png" alt="search ms17-010">
+      <p>Esto nos dará varias entradas, pero el título de la <em>Room</em> nos dice cual es la que nos interesa, en este caso es la primera(la 0 en idioma informático).</p>
+
+      Usamos el modulo 0 y mostramos sus opciones, en este caso la única obligatoria es RHOST.</p>
+      <img src="img/image-5.png" alt="opciones exploit">
+      <p>Establecemos el valor de RHOST, y cambio el de LHOST, ya que estaba pillando otra IP.</p>
+      <img src="img/image-6.png" alt="set RHOST LHOST">
+
+      <p>Antes de iniciar el exploit, los creadores nos recomiendan establecer el siguiente payload.</p>
+      <img src="img/image-7.png" alt="set payload">
+      <p>Lo establecemos e iniciamos el exploit con <em>run</em>.</p>
+      <img src="img/image-8.png" alt="run exploit">
+
+      <p>Ya estaríamos dentro del sistema de Windows, pero esta terminal no nos gusta, vamos a mejorarala.</p>
+      <img src="img/image-9.png" alt="mejorar shell">
+      <p>Paramos la sesión con CTRL + Z.</p>
+
+      <p>Seleccionamos el siguiente módulo ponemos la sesión que acabamos de parar</p>
+      <img src="img/image-11.png" alt="opciones módulo">
+
+      <img src="img/image-12.png" alt="sessions -l">
+
+      Lo iniciamos y lo dejamos cargar, se lleva su tiempo, pero si pone session 2 opened, ya puedes darle a <em>enter</em>.</p>
+      <img src="img/image-13.png" alt="session 2 opened">
+      <p>Yo esperé un rato más, creyendo que iba a parar/pasar algo, pero no, hay que darle al enter.</p>
+      <img src="img/image-14.png" alt="meterpreter">
+
+      <p>Usamos la nueva sesión y continuamos con el análisis</p>
+      <img src="img/image-15.png" alt="ps">
+
+      <p><em>Ahora se viene una parte que no entendí muy bien</em></p>
+      <p>- Encuentra un proceso al final de la lista que esté siendo ejecutado por NT AUTHORITY\SYSTEM<br>
+      De toda la lista de antes, elegí uno al azar, no sé si tuve suerte, si todos sirven...</p>
+      <img src="img/image-16.png" alt="proceso SYSTEM">
+
+      <p>Y, usando ese proceso, podemos sacar los hashes de los usuarios de la máquina.</p>
+      <pre>Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:
+Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d::</pre>
+      <p>Le pasamos un john the reaper al hash de Jon y sacamos su contraseña.</p>
+      <img src="img/image-17.png" alt="john the ripper">
+
+      <p>Ahora simplemente buscamos las flags por todo el sistema de archivos</p>
+
+      <p>- Flag1? Esta flag se puede encontrar en el fichero raíz C:/.</p>
+      <img src="img/image-18.png" alt="flag 1"><br>
+      <blockquote class="flag">flag{access_the_machine}</blockquote>
+
+      <p>- Flag2? Esta flag se encuentra donde Windows guarda las contraseñas de los usuarios.</p>
+      <img src="img/image-19.png" alt="flag 2"><br>
+      <blockquote class="flag">flag{sam_database_elevated_access}</blockquote>
+
+      <p>- Flag3? Esta flag está entre los archivos de Jon.</p>
+      <img src="img/image-20.png" alt="flag 3"><br>
+      <blockquote class="flag">flag{admin_documents_can_be_valuable}</blockquote>
+    </div>
+  </div>
+</body>
+</html>

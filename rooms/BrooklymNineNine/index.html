@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Brooklyn Nine Nine - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Brooklyn Nine Nine</h1>
+    <p><em>This room is aimed for beginner level hackers but anyone can try to hack this box. There are two main intended ways to root the box.</em></p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Esta máquina nos da rienda suelta para hacer lo que queramos, solo nos pide iniciar sesión como usuario y escalar privilegios.</p>
+      <p>Empezamos como siempre, haciendo un escaneo de los puertos abiertos de la máquina:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+      <img src="img/image-1.png" alt="Escaneo de puertos 2">
+      <p>Tenemos 3 puertos abiertos, veamos el 80:</p>
+      <img src="img/image-2.png" alt="Web puerto 80">
+      <img src="img/image-3.png" alt="Web código fuente">
+
+      <p>El código fuente nos dice que usemos <em>stenografía</em>:</p>
+      <img src="img/image-4.png" alt="Pista estenografía">
+      <p>Efectivamente, hay algo ahí, pero no tenemos el salvoconducto.</p>
+      <p>Podemos usar la herramienta <code>stegcracker</code>, que es como <code>john</code> pero para stenografía:</p>
+      <img src="img/image-5.png" alt="Stegcracker uso">
+      <img src="img/image-6.png" alt="Stegcracker resultado">
+      <p>Encontramos la contraseña de holt. Iniciamos sesión con estas credenciales por ssh:</p>
+      <img src="img/image-7.png" alt="SSH acceso holt">
+
+      <p>Ya estamos dentro del sistema con un usuario normal, hora de escalar privilegios.</p>
+      <p>Vamos a ver los permisos que tiene <em>holt</em>:</p>
+      <img src="img/image-8.png" alt="sudo -l holt">
+
+      <p>Si podemos usar <code>nano</code> con altos privilegios, podríamos cambiar los permisos del archivo sudoers:</p>
+      <img src="img/image-9.png" alt="nano sudoers">
+      <img src="img/image-10.png" alt="nano sudoers edit">
+      <img src="img/image-11.png" alt="root obtenido">
+
+      <p>Y ya, jeje.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Relevant - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Relevant</h1>
+    <p>Esta room de TryHackMe, basada en Windows, nos reta a encontrar dos flags: una como usuario normal y otra como administrador, sin indicaciones explícitas de procedimiento.</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Comenzamos con un escaneo de puertos a la máquina:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Observamos un servidor web (IIS) y un servicio SMB. Mientras se realiza el fuzzeo de directorios:</p>
+      <img src="img/image-1.png" alt="Fuzzeo directorios">
+
+      <p>Explorando el SMB:</p>
+      <img src="img/image-2.png" alt="SMB abierto">
+
+      <p>Encontramos un archivo <strong>passwords.txt</strong> con dos usuarios y dos contraseñas:</p>
+      <img src="img/image-3.png" alt="passwords.txt">
+
+      <p>El fuzzeo inicial no arroja resultados, así que realizamos un escaneo de todos los puertos:</p>
+      <img src="img/image-4.png" alt="Escaneo completo">
+      <img src="img/image-5.png" alt="Más puertos">
+
+      <p>Descubrimos un nuevo servidor web en el puerto 49663 (otro IIS). Tras un nuevo fuzzeo, hallamos un directorio <i>nt4wrksv</i>, igual que la carpeta compartida de SMB, e intentamos acceder al archivo <i>password.txt</i>.</p>
+      <blockquote>Gobuster da error al fuzzear en este punto.</blockquote>
+
+      <h3>Reinicio de la máquina</h3>
+      <p>Tras reiniciar la máquina de TryHackMe, los fuzzeos funcionan correctamente:</p>
+      <img src="img/image-7.png" alt="Fuzzeo tras reinicio">
+
+      <p>Comprobamos que el archivo <code>password.txt</code> es el mismo visto anteriormente:</p>
+      <img src="img/image-8.png" alt="password.txt web">
+
+      <p>Asumimos que la carpeta compartida y el directorio web son equivalentes. Intentamos subir un payload para obtener una reverse shell:</p>
+      <img src="img/image-13.png" alt="Payloads creados">
+
+      <p>Subimos los payloads a la carpeta compartida:</p>
+      <img src="img/image-11.png" alt="Subida de payloads">
+
+      <p>Ponemos un puerto en escucha con <code>nc -lvp 4444</code> y ejecutamos la shell desde el navegador:</p>
+      <img src="img/image-14.png" alt="Ejecución reverse shell">
+      <blockquote>Pensaba que había fallado, pero tarda un montón en arrancar.</blockquote>
+
+      <img src="img/image-15.png" alt="Primera flag encontrada"><br>
+      <blockquote class="flag">Primera flag encontrada</blockquote>
+    </div>
+
+    <div class="section">
+      <h2>Escalada de Privilegios</h2>
+      <p>Para escalar privilegios, consultamos la versión de Windows y encontramos un exploit recomendado:</p>
+      <img src="img/image-16.png" alt="Exploit recomendado">
+
+      <p>Ejecutamos los comandos sugeridos uno a uno:</p>
+      <img src="img/image-17.png" alt="Comando 1">
+      <img src="img/image-18.png" alt="Comando 2">
+      <img src="img/image-19.png" alt="Comando 3">
+      <img src="img/image-20.png" alt="Comando 4">
+      <img src="img/image-21.png" alt="Comando 5">
+
+      <p>Ya somos administradores y conseguimos la última flag:</p>
+      <img src="img/image-22.png" alt="Flag de root"><br>
+      <blockquote class="flag">Flag de administrador encontrada</blockquote>
+    </div>
+  </div>
+</body>
+</html>

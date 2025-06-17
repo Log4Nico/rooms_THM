@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Retro - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Retro</h1>
+    <p>Esta room es igual a una anterior vista, <a href="../Blaster/">Blaster</a>, la única diferencia es que esta no te guía tanto en THM, pero la resolución es igual, salvo por un molesto bug que aparece en Windows Server, que no nos deja escalar privilegios de la misma manera.</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos con un escaneo de puertos a la máquina host:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+      <blockquote>El creador nos dice que no podemos hacer ping a la máquina, por eso ponemos -Pn.</blockquote>
+      <img src="img/image-1.png" alt="Escaneo nmap">
+
+      <p>En el puerto 80 encontramos el index por defecto de Microsoft IIS.</p>
+      <p>Hacemos un fuzzeo de los directorios:</p>
+      <img src="img/image-2.png" alt="Fuzzing directorios">
+      <blockquote>/retro y /Retro son el mismo directorio.</blockquote>
+
+      <p>Encontramos el directorio <strong>/retro</strong>, que parece ser un blog personal de Wade donde habla de videojuegos, películas y curiosidades:</p>
+      <img src="img/image-3.png" alt="Blog retro">
+
+      <p>En una entrada del blog:</p>
+      <img src="img/image-4.png" alt="Entrada blog">
+      <p>Wade nos da una pista de su contraseña para logearse en el sistema: el nombre del avatar del personaje con su mismo nombre de la película/libro <em>Ready Player One</em>.</p>
+      <img src="img/image-5.png" alt="Pista avatar">
+      <img src="img/image-6.png" alt="Comentario contraseña">
+
+      <p>Usamos Remmina para conectarnos por escritorio remoto a la máquina host con las credenciales encontradas:</p>
+      <img src="img/image-7.png" alt="Remmina login">
+      <img src="img/image-8.png" alt="Primera flag">
+      <blockquote>Encontramos la primera flag.</blockquote>
+
+      <p>En la papelera encontramos un archivo desconocido:</p>
+      <img src="img/image-9.png" alt="Archivo papelera">
+
+      <p>En el historial del navegador encontramos la página del <strong>CVE-2019-1388</strong>, cuya explotación está explicada en este <a href="https://github.com/nobodyatall648/CVE-2019-1388" target="_blank">repositorio</a>:</p>
+      <img src="img/image-10.png" alt="CVE-2019-1388">
+
+      <p>Iniciamos la aplicación de la papelera:</p>
+      <img src="img/image-11.png" alt="Aplicación papelera">
+      <p>Le damos a <em>Show more details</em>:</p>
+      <img src="img/image-12.png" alt="Show more details">
+      <p>Y a la página del certificado:</p>
+      <img src="img/image-13.png" alt="Página certificado">
+
+      <img src="img/image-14.png" alt="Bug Windows Server">
+      <blockquote>Aquí debería salirnos Google Chrome o Internet Explorer, pero no lo hace. Es un bug de Windows Server, por lo que no podemos resolver la máquina de la misma forma.</blockquote>
+
+      <p>Buscando en internet y preguntando a ChatGPT, encontramos el <strong><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-0213" target="_blank">CVE-2017-0213</a></strong>:</p>
+      <img src="img/image-15.png" alt="CVE-2017-0213">
+
+      <p>Permite escalar privilegios al iniciar una aplicación específica. En el repositorio de <a href="https://github.com/eonrickity/CVE-2017-0213" target="_blank">eonrickity</a> encontramos la aplicación necesaria para escalar privilegios:</p>
+      <img src="img/image-16.png" alt="Descarga exploit">
+      <img src="img/image-17.png" alt="Subida exploit">
+
+      <p>Descargamos y ejecutamos el exploit, y automáticamente seremos administradores:</p>
+      <img src="img/image-18.png" alt="Shell admin">
+      <img src="img/image-19.png" alt="Comprobación admin">
+      <img src="img/image-20.png" alt="Redirigir flag">
+      <blockquote>Como no podemos copiar y pegar en esta terminal, hacemos un <code>type</code> (cat de Windows) y lo redirigimos al escritorio de Wade.</blockquote>
+      <img src="img/image-21.png" alt="Flag final">
+      <blockquote>Última flag encontrada.</blockquote>
+    </div>
+  </div>
+</body>
+</html>

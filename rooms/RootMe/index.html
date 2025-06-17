@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>RooMe - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RooMe</h1>
+    <p><em>A ctf for beginners, can you root me?</em></p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Arrancamos el análisis con un escaneo de la máquina, obteniendo:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+      <p>2 puertos abiertos: <strong>22</strong> (ssh) y <strong>80</strong> (http). Empezamos viendo el 80:</p>
+      <img src="img/image-1.png" alt="Web principal">
+
+      <p>En el código fuente no se encuentra nada relevante, así que probamos con un fuzzeo de directorios:</p>
+      <img src="img/image-2.png" alt="Fuzzing 1">
+      <img src="img/image-3.png" alt="Fuzzing 2">
+
+      <p>Encontramos un panel para subir archivos, que aparecen en la carpeta <code>uploads</code>:</p>
+      <img src="img/image-4.png" alt="Panel de subida">
+
+      <p>La idea es subir una <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank">reverse shell</a> y abrirla desde el navegador:</p>
+      <img src="img/image-5.png" alt="Subida reverse shell">
+      <img src="img/image-6.png" alt="Reverse shell en uploads">
+      <img src="img/image-7.png" alt="Reverse shell ejecutada">
+      <blockquote>:)</blockquote>
+
+      <p>El formato <em>php</em> tiene alternativas para evadir filtros:</p>
+      <img src="img/image-8.png" alt="Alternativas php">
+      <img src="img/image-9.png" alt="Pruebas de extensiones">
+      <blockquote>Alguna funcionará...</blockquote>
+
+      <p>Ponemos nuestra máquina en escucha y probamos cuál nos da acceso al sistema:</p>
+      <img src="img/image-10.png" alt="Acceso conseguido">
+      <blockquote>La 5</blockquote>
+
+      <p>Ya dentro del sistema (en <code>/var/www</code> encontramos la primera flag), toca escalar privilegios. THM recomienda buscar archivos con permisos SUID:</p>
+      <img src="img/image-11.png" alt="Archivos SUID">
+
+      <p>Nos devuelve muchos, pero el que más interesa es <em>python</em>.</p>
+      <p>En <a href="https://gtfobins.github.io/gtfobins/python/#suid" target="_blank">GTFOBins</a> encontramos cómo bypasear la seguridad usando python con SUID:</p>
+      <img src="img/image-12.png" alt="GTFOBins python SUID">
+
+      <p>¡Y ya estaría! Hemos vulnerado la máquina y escalado privilegios.</p>
+    </div>
+  </div>
+</body>
+</html>
