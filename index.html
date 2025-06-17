@@ -1,23 +1,219 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Repositorio de Máquinas TryHackMe</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscador con Botones</title>
+  <style>
+    body {
+      font-family: serif;
+      background-color: #00060e;
+      color: #f0f0f0;
+      height: 100vh;
+      margin: 0;
+      background-image: url('assets/log4nico.png');
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: 75%;
+      background-position: center 40%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 50px;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      background-color: #1e1e1e;
+      padding: 15px 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: fit-content;
+      box-shadow: 0 0 15px #00000088;
+    }
+
+    label {
+      display: none;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border: none;
+      border-radius: 6px 0 0 6px;
+      background-color: #2a2a2a;
+      color: #fff;
+      outline: none;
+      width: 200px;
+    }
+
+    .btn.buscar {
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      background-color: blue;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background-color: limegreen;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #444;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-group-right {
+      display: flex;
+      gap: 15px;
+    }
+
+    .maquinas-container {
+      display: grid;
+      grid-template-columns: repeat(3, 250px);
+      background-color: rgba(38, 0, 255, 0.514);
+      border-radius: 30px;
+      gap: 20px;
+      padding: 30px;
+      margin: 0 auto;
+    }
+
+    .maquina {
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 10px 10px 10px rgba(41, 41, 41, 0.700);
+      transition: transform 0.2s;
+    }
+
+    .maquina:hover {
+      transform: scale(1.02);
+    }
+
+    .maquina h3 {
+      margin: 0;
+      color: limegreen;
+    }
+
+    .maquina p {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
-  <div class="background-image"></div>
-  <div class="buscador-centro">
-    <form id="search-form" class="search-form">
-      <div class="search-input-container">
-        <span class="icon-search">&#128269;</span>
-        <input type="text" id="search-input" placeholder="Buscar máquina..." autocomplete="off" />
+  <header class="title">
+    <h1>Máquinas TryHackMe</h1>
+    <h3><i>Por Log4Nico</i></h3>
+    <h4>Máquinas totales: XX</h4>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="group">
+        <label for="busqueda">Buscar</label>
+        <input type="text" id="busqueda" placeholder="Buscar..." />
+        <button class="btn buscar" type="button">Buscar</button>
       </div>
-      <button type="submit" class="search-btn">Buscar</button>
-      <!-- Aquí irían los dropdowns -->
-    </form>
-  </div>
-  <section id="maquinas-list"></section>
-  <script src="script.js"></script>
+      <div class="btn-group-right">
+        <button class="btn" type="button">Tipo</button>
+        <button class="btn" type="button">Dificultad</button>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div id="maquinas-container" class="maquinas-container"></div>
+  </main>
+
+<script>
+  let maquinasGlobal = [];
+
+  fetch('data/maquinas.json')
+    .then(res => {
+      if (!res.ok) throw new Error("No se pudo cargar el JSON");
+      return res.json();
+    })
+    .then(maquinas => {
+      maquinasGlobal = maquinas;
+      mostrarMaquinas(maquinasGlobal);
+    })
+    .catch(err => console.error("Error al cargar el JSON:", err));
+
+  function mostrarMaquinas(maquinas) {
+    const container = document.getElementById("maquinas-container");
+    container.innerHTML = "";
+
+    maquinas.forEach(m => {
+      const nombre = m.nombre || "Sin nombre";
+      const tipo = m.tipo || "Desconocido";
+      const dificultad = m.dificultad || "No indicada";
+
+      // Determinar color según la dificultad
+      let bgColor = "#1c1c1c"; // por defecto
+      switch (dificultad.toLowerCase()) {
+        case "fácil":
+          bgColor = "#154e12";
+          break;
+        case "media":
+          bgColor = "#4e4e12";
+          break;
+        case "difícil":
+          bgColor = "#4e1212";
+          break;
+      }
+
+      const div = document.createElement("div");
+      div.classList.add("maquina");
+      div.style.backgroundColor = bgColor;
+
+      div.innerHTML = `
+        <h3>${nombre}</h3>
+        <p>Tipo: ${tipo}</p>
+        <p>Dificultad: ${dificultad}</p>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  document.getElementById("busqueda").addEventListener("input", function () {
+    const texto = this.value.toLowerCase();
+
+    const filtradas = maquinasGlobal.filter(m => {
+      const nombre = String(m.nombre || "").toLowerCase();
+      const tipo = String(m.tipo || "").toLowerCase();
+      const dificultad = String(m.dificultad || "").toLowerCase();
+
+      return (
+        nombre.includes(texto) ||
+        tipo.includes(texto) ||
+        dificultad.includes(texto)
+      );
+    });
+
+    mostrarMaquinas(filtradas);
+  });
+</script>
+
+
 </body>
 </html>

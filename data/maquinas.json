@@ -1,0 +1,252 @@
+[
+  {
+    "nombre": "Pickle Rick",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Agent Sudo",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Security Awareness",
+    "dificultad": "Info",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Common Attacks",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría", "Ataques Comunes"]
+  },
+  {
+    "nombre": "Pentesting Fundamentals",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Security Principles",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Introductory Researching",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Intro to Digital Forensics",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "DFIR: An Introduction",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Digital Forensics Case B4DM755",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría", "Forense"]
+  },
+  {
+    "nombre": "Nmap",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría"]
+  },
+  {
+    "nombre": "Offensive Security Info",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría", "Pentesting"]
+  },
+  {
+    "nombre": "Red Team Fundamentals",
+    "dificultad": "Fácil",
+    "tipo": ["Teoría", "Pentesting"]
+  },
+  {
+    "nombre": "Careers in Cyber",
+    "dificultad": "Info",
+    "tipo": ["Teoría", "Todo"]
+  },
+  {
+    "nombre": "c4ptur3-th3-fl4g",
+    "dificultad": "Fácil",
+    "tipo": ["CTF"]
+  },
+  {
+    "nombre": "XSS",
+    "dificultad": "Fácil",
+    "tipo": ["Web", "Vulnerabilidad"]
+  },
+  {
+    "nombre": "CSRF",
+    "dificultad": "Media",
+    "tipo": ["Web", "Vulnerabilidad"]
+  },
+  {
+    "nombre": "Insecure Deserialisation",
+    "dificultad": "Media",
+    "tipo": ["Web", "Vulnerabilidad"]
+  },
+  {
+    "nombre": "SQL Injection",
+    "dificultad": "Media",
+    "tipo": ["Web", "Vulnerabilidad"]
+  },
+  {
+    "nombre": "SQLMAP",
+    "dificultad": "Fácil",
+    "tipo": ["Herramienta", "Web"]
+  },
+  {
+    "nombre": "Ivenstigating Windows",
+    "dificultad": "Fácil",
+    "tipo": ["Forense"]
+  },
+  {
+    "nombre": "Disk Analysis & Autopsy",
+    "dificultad": "Media",
+    "tipo": ["Forense"]
+  },
+  {
+    "nombre": "Windows Forensics 1",
+    "dificultad": "Media",
+    "tipo": ["Forense", "Windows"]
+  },
+  {
+    "nombre": "Light",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Ignite",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Bolt",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Blue",
+    "dificultad": "Fácil",
+    "tipo": ["Blue Team", "Resolución de incidentes"]
+  },
+  {
+    "nombre": "Ice",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Kenobi",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Easy Peasy",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Blaster",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Daili Bugle",
+    "dificultad": "Difícil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Library",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Retro",
+    "dificultad": "Difícil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Tech_Supp0rt: 1",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Relevant",
+    "dificultad": "Media",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Anthem",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Basic Pentesting",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "RootMe",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Brooklym Nine Nine",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Bounty hacker",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Poster",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Startup",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "LazyAdmin",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Soc Fundamentals",
+    "dificultad": "Fácil",
+    "tipo": ["Blue Team", "SOC"]
+  },
+  {
+    "nombre": "SOC L1 Alert Triage",
+    "dificultad": "Fácil",
+    "tipo": ["Blue Team", "SOC"]
+  },
+  {
+    "nombre": "Simple CTF",
+    "dificultad": "Fácil",
+    "tipo": ["CTF"]
+  },
+  {
+    "nombre": "Mobile Acquisition",
+    "dificultad": "Info",
+    "tipo": ["Teoría", "Forense", "Móvil"]
+  },
+  {
+    "nombre": "Lo-Fi",
+    "dificultad": "Fácil",
+    "tipo": ["Pentesting"]
+  },
+  {
+    "nombre": "Security Footage",
+    "dificultad": "Media",
+    "tipo": ["Forense"]
+  }
+]
