@@ -1,0 +1,83 @@
+body {
+  background: #101820;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  position: relative;
+}
+
+.background-image {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 35vw;
+  height: 100vh;
+  background: url('assets/tu-imagen-fondo.png') no-repeat right center;
+  background-size: contain;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.search-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+#search-form {
+  display: flex;
+  align-items: center;
+  background: #181A20;
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 2px 8px #000a;
+}
+
+.icon-search {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  color: #7fffd4;
+}
+
+#search-input {
+  background: #23272f;
+  border: none;
+  border-radius: 8px;
+  color: #e0e0e0;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  flex: 1;
+  outline: none;
+}
+
+button, .dropdown-btn {
+  background: #1f6f43;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+button:hover, .dropdown-btn:hover {
+  background: #25a36f;
+}
+
+.dropdowns {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+/* Personaliza los menús desplegables aquí */
