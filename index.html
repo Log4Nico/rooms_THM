@@ -5,120 +5,193 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rooms Log4Nico</title>
   <style>
-    body {
-      font-family: serif;
-      background-color: #00060e;
-      height: 100vh;
-      margin: 0;
-      color: white;
-      background-image: url('assets/log4nico.png');
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-size: 75%;
-      background-position: center 40%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 50px;
-    }
+  body {
+    font-family: serif;
+    background-color: #00060e;
+    height: 100vh;
+    margin: 0;
+    color: white;
+    background-image: url('assets/log4nico.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 75%;
+    background-position: center 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 50px;
+  }
 
-    .title {
-      text-align: center;
-      margin-bottom: 30px;
+  .title {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .container {
+    background-color: #1e1e1e;
+    padding: 15px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: fit-content;
+    box-shadow: 0 0 15px #00000088;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  label {
+    display: none;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    background-color: #2a2a2a;
+    color: #fff;
+    outline: none;
+    width: 200px;
+  }
+
+  .btn.buscar {
+    padding: 10px 16px;
+    border-radius: 0 6px 6px 0;
+    background-color: blue;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    background-color: limegreen;
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #444;
+  }
+
+  .group {
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-group-right {
+    display: flex;
+    gap: 15px;
+  }
+
+  .maquinas-container {
+    display: grid;
+    grid-template-columns: repeat(3, 250px);
+    background-color: rgba(38, 0, 255, 0.514);
+    border-radius: 30px;
+    gap: 20px;
+    padding: 30px;
+    margin: 0 auto;
+  }
+
+  .maquina {
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 10px 10px 10px rgba(41, 41, 41, 0.700);
+    transition: transform 0.2s;
+  }
+
+  .maquina:hover {
+    transform: scale(1.02);
+  }
+
+  .maquina h2 {
+    margin: 0;
+    color: limegreen;
+  }
+
+  .maquina p {
+    font-size: 16px;
+    margin-top: 5px;
+    color: #ccc;
+  }
+
+  /* ADAPTACIÓN A MÓVILES */
+  @media (max-width: 768px) {
+    body {
+      background-size: cover;
+      background-position: center center;
+      padding-top: 20px;
     }
 
     .container {
-      background-color: #1e1e1e;
-      padding: 15px 20px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      width: fit-content;
-      box-shadow: 0 0 15px #00000088;
-    }
-
-    label {
-      display: none;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      border: none;
-      border-radius: 6px 0 0 6px;
-      background-color: #2a2a2a;
-      color: #fff;
-      outline: none;
-      width: 200px;
-    }
-
-    .btn.buscar {
-      padding: 10px 16px;
-      border-radius: 0 6px 6px 0;
-      background-color: blue;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .btn {
-      padding: 10px 16px;
-      background-color: limegreen;
-      border: none;
-      border-radius: 6px;
-      color: #000;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn:hover {
-      background-color: #444;
+      flex-direction: column;
+      width: 90%;
     }
 
     .group {
-      display: flex;
-      align-items: center;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .btn.buscar {
+      width: 100%;
+      border-radius: 6px;
     }
 
     .btn-group-right {
-      display: flex;
-      gap: 15px;
+      flex-direction: column;
+      width: 100%;
+      gap: 10px;
+      margin-top: 10px;
     }
 
     .maquinas-container {
-      display: grid;
-      grid-template-columns: repeat(3, 250px);
-      background-color: rgba(38, 0, 255, 0.514);
-      border-radius: 30px;
-      gap: 20px;
-      padding: 30px;
-      margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  background-color: rgba(38, 0, 255, 0.514);
+  border-radius: 30px;
+  gap: 20px;
+  padding: 30px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.maquina {
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 10px 10px 10px rgba(41, 41, 41, 0.700);
+  transition: transform 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.4rem;
     }
 
-    .maquina {
-      background-color: #1c1c1c;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 10px 10px 10px rgba(41, 41, 41, 0.700);
-      transition: transform 0.2s;
+    h3, h4 {
+      font-size: 1rem;
     }
+  }
+</style>
 
-    .maquina:hover {
-      transform: scale(1.02);
-    }
-
-    .maquina h2 {
-      margin: 0;
-      color: limegreen;
-    }
-
-    .maquina p {
-      font-size: 16px;
-      margin-top: 5px;
-      color: #ccc;
-    }
-  </style>
 </head>
 <body>
   <header class="title">
