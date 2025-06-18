@@ -197,7 +197,7 @@
   <header class="title">
     <h1>Máquinas TryHackMe</h1>
     <h3><i>Por Log4Nico</i></h3>
-    <h4>Máquinas totales: XX</h4>
+    <h4>Máquinas totales: <span id="contador-maquinas">0</span></h4>
   </header>
 
   <main>
@@ -273,6 +273,7 @@
         <p>Dificultad: ${dificultad}</p>
       `;
       container.appendChild(div);
+      document.getElementById("contador-maquinas").textContent = maquinas.length;
     });
   }
 
