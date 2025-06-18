@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Security Footage - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Security Footage</h1>
+    <p><em>En este write-up, analizaremos un archivo .pcap con Wireshark para recuperar imágenes perdidas de una cámara de seguridad, aplicando técnicas de análisis forense digital.</em></p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>El reto nos proporciona un archivo de captura de tráfico de red (PCAP) que debemos analizar para encontrar una grabación de una cámara.</p>
+      <p>Para ello, utilizaremos Wireshark, una herramienta gratuita y multiplataforma para inspección profunda de paquetes.</p>
+      <img src="img/image.png" alt="WireShark">
+
+      <p>Lo primero que haré es ver si se puede exportar algún objeto directamente:</p>
+      <img src="img/image-1.png" alt="Objetos">
+      <pre>Para ahorraros el disgusto, ninguno de estos funciona.</pre>
+      
+      <p>El primer paquete <b>GET</b> contiene esta cabecera, podríamos seguir los paquetes para ver qué podemos sacar:</p>
+      <img src="img/image-2.png" alt="Cabecera">
+
+      <p>Parece que hemos encontrado algo aquí. Se trata de una cabecera que indica la descarga de lo que parece ser una imagen:</p>
+      <img src="img/image-3.png" alt="Descarga">
+      <pre>Además, el JFIF indica que el archivo es una imagen</pre>
+
+      <p>Ahora tendremos que hacer algo un poco complicado: descargarnos el paquete en hexadecimal, quitarle las cabeceras y quedarnos únicamente con el archivo:</p>
+      <img src="img/image-4.png" alt="Paquete hexadecimal">
+      <pre>Tenemos que quitar todo eso</pre>
+
+      <p>Para editar el hexadecimal, podemos usar la herramienta <b>Ghex</b> de Linux.</p>
+      <img src="img/image-5.png" alt="Ghex">
+
+      <p>Una vez quitadas las cabeceras, nos quedará el siguiente archivo:</p>
+      <img src="img/image-6.png" alt="Casi">
+      <pre>Pensé que sería un video o un gif, pero no, es una cadena de imágenes superpuestas.</pre>
+
+      <p>Tendremos que extraer todas las imágenes del interior. Usaré <b>binwalk</b> para ello:</p>
+      <img src="img/image-7.png" alt="Binwalk">
+      <pre>Esto nos extraerá todas las imágenes imbuidas en el archivo original.</pre>
+
+      <img src="img/image-8.png" alt="Extraccion">
+      <pre>1082 imágenes, 3 Gb :)</pre>
+
+      <p>No os mentiré, no sé si hice mal el reto o si lo hice pero no de la manera correcta.</p>
+      <p>Pero ya quedaría resuelto el desafío, solo tenemos que ir completando la flag con las imágenes que hemos sacado.</p>
+
+      <pre>Con este reto hemos aprendido a identificar tráfico relevante en WireShark y extraer archivos de paquetes pcap.</pre>
+    </div>
+  </div>
+</body>
+</html>

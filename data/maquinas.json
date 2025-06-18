@@ -296,7 +296,7 @@
   {
     "nombre": "Security Footage",
     "dificultad": "Media",
-    "tipo": ["Forense"],
-    "ruta": "./rooms/#"
+    "tipo": ["Forense", "SOC", "Wireshark"],
+    "ruta": "./rooms/SecurityFootage"
   }
 ]
