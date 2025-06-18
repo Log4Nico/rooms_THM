@@ -12,18 +12,6 @@
     "ruta": "./rooms/SudoAgent"
   },
   {
-    "nombre": "Security Awareness",
-    "dificultad": "Info",
-    "tipo": ["Teoría"],
-    "ruta": "./rooms/#"
-  },
-  {
-    "nombre": "Common Attacks",
-    "dificultad": "Fácil",
-    "tipo": ["Teoría", "Ataques Comunes"],
-    "ruta": "./rooms/#"
-  },
-  {
     "nombre": "Pentesting Fundamentals",
     "dificultad": "Fácil",
     "tipo": ["Teoría"],
@@ -36,19 +24,7 @@
     "ruta": "./rooms/#"
   },
   {
-    "nombre": "Introductory Researching",
-    "dificultad": "Fácil",
-    "tipo": ["Teoría"],
-    "ruta": "./rooms/#"
-  },
-  {
     "nombre": "Intro to Digital Forensics",
-    "dificultad": "Fácil",
-    "tipo": ["Teoría"],
-    "ruta": "./rooms/#"
-  },
-  {
-    "nombre": "DFIR: An Introduction",
     "dificultad": "Fácil",
     "tipo": ["Teoría"],
     "ruta": "./rooms/#"
@@ -75,12 +51,6 @@
     "nombre": "Red Team Fundamentals",
     "dificultad": "Fácil",
     "tipo": ["Teoría", "Pentesting"],
-    "ruta": "./rooms/#"
-  },
-  {
-    "nombre": "Careers in Cyber",
-    "dificultad": "Info",
-    "tipo": ["Teoría", "Todo"],
     "ruta": "./rooms/#"
   },
   {
