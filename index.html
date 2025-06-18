@@ -208,8 +208,31 @@
         <button class="btn buscar" type="button">Buscar</button>
       </div>
       <div class="btn-group-right">
-        <button class="btn" type="button">Tipo</button>
-        <button class="btn" type="button">Dificultad</button>
+        <select id="select-dificultad" class="select btn">
+  <option value="">Dificultad</option>
+  <option value="fácil">Fácil</option>
+  <option value="media">Media</option>
+  <option value="difícil">Difícil</option>
+  <option value="info">Info</option>
+</select>
+
+<select id="select-tipo" class="select btn">
+  <option value="">Tipo</option>
+  <option value="Pentesting">Pentesting</option>
+  <option value="Teoría">Teoría</option>
+  <option value="Forense">Forense</option>
+  <option value="CTF">CTF</option>
+  <option value="Web">Web</option>
+  <option value="Vulnerabilidad">Vulnerabilidad</option>
+  <option value="Herramienta">Herramienta</option>
+  <option value="Windows">Windows</option>
+  <option value="Blue Team">Blue Team</option>
+  <option value="Resolución de incidentes">Resolución de incidentes</option>
+  <option value="SOC">SOC</option>
+  <option value="Móvil">Móvil</option>
+  <option value="Wireshark">Wireshark</option>
+</select>
+
       </div>
     </div>
 
@@ -282,18 +305,42 @@
 
     const filtradas = maquinasGlobal.filter(m => {
       const nombre = String(m.nombre || "").toLowerCase();
-      const tipo = String(m.tipo || "").toLowerCase();
-      const dificultad = String(m.dificultad || "").toLowerCase();
-
       return (
-        nombre.includes(texto) ||
-        tipo.includes(texto) ||
-        dificultad.includes(texto)
+        nombre.includes(texto)
       );
     });
 
     mostrarMaquinas(filtradas);
   });
+
+    // Lógica para filtrar por dificultad y tipo
+  const dificultadSelect = document.getElementById("select-dificultad");
+  const tipoSelect = document.getElementById("select-tipo");
+  const textoBusqueda = document.getElementById("busqueda");
+
+  function filtrarMaquinas() {
+    const dificultad = dificultadSelect.value.toLowerCase();
+    const tipo = tipoSelect.value.toLowerCase();
+    const texto = textoBusqueda.value.toLowerCase();
+
+    const filtradas = maquinasGlobal.filter(m => {
+      const nombre = String(m.nombre || "").toLowerCase();
+      const dificultadMaquina = String(m.dificultad || "").toLowerCase();
+      const tipoMaquina = String(m.tipo || "").toLowerCase();
+
+      return (
+        nombre.includes(texto) &&
+        (dificultad === "" || dificultadMaquina === dificultad) &&
+        (tipo === "" || tipoMaquina === tipo)
+      );
+    });
+
+    mostrarMaquinas(filtradas);
+  }
+
+  dificultadSelect.addEventListener("change", filtrarMaquinas);
+  tipoSelect.addEventListener("change", filtrarMaquinas);
+  textoBusqueda.addEventListener("input", filtrarMaquinas);
 </script>
 
 
