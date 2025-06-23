@@ -268,5 +268,11 @@
     "dificultad": "Media",
     "tipo": ["Forense", "SOC", "Wireshark"],
     "ruta": "./rooms/SecurityFootage"
+  },
+  {
+    "nombre": "Mr. Robot",
+    "dificultad": "Media",
+    "tipo": ["Pentesting", "Linux", "Burpsuite", "ZAP"],
+    "ruta": "./rooms/mrrobot"
   }
 ]

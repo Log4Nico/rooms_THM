@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mr. Robot - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #00060e;
+      color: #e6e6e6;
+      font-family: serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #292e39;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem;
+    }
+    h1 {
+      color: limegreen;
+    }
+    h2, h3 {
+      color: #70e1f5;
+      margin-top: 1.5em;
+    }
+    pre, code {
+      background: #181c22;
+      color: #d1d1d1;
+      border-radius: 4px;
+      padding: 0.5em;
+      font-family: serif;
+    }
+    blockquote {
+      border-left: 4px solid #70e1f5;
+      background: #23272f;
+      margin: 1em 0;
+      padding: 0.7em 1em;
+      color: #b0b8c1;
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1em 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    ul, ol {
+      margin-left: 2em;
+    }
+    .flag {
+      display: inline-block;
+      background: #181c22;
+      color: #70e1f5;
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      font-weight: bold;
+      margin: 0.2em 0;
+    }
+    .section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mr. Robot</h1>
+    <p>En este reto tematizado de <b>Mr. Robot</b> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina a traves de 
+      Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que me permite automatizar el envío 
+      de múltiples peticiones de login y analizar las respuestas para detectar posibles accesos válidos, todo sin desvelar detalles concretos del reto.</p>
+
+    <div class="section">
+      <h2>Análisis</h2>
+      <p>Empezamos el análisis escaneando los puertos de la máquina:</p>
+      <img src="img/image.png" alt="Escaneo de puertos">
+
+      <p>Encontramos 3 puertos abiertos:</p>
+      <ul>
+        <li>Puerto 22  - SSH</li>
+        <li>Puerto 80  - Apache http</li>
+        <li>Puerto 443 - Apache https</li>
+      </ul>
+
+      <blockquote>Os adelanto que los 2 servicios web alojan la misma página.</blockquote>
+
+      <p>Vamos a ver que tipo de página web encontramos:</p>
+      <img src="img/image-1.png" alt="Pagina principal">
+
+      <blockquote><i>Hola, amigo. Si has llegado, has llegado por una razón. 
+        Puede que aún no puedas explicarlo, pero hay una parte de ti que está 
+        agotada de este mundo... un mundo que decide dónde trabajas, 
+        a quién ves y cómo vacías y llenas tu deprimente cuenta bancaria. 
+        Incluso la conexión a Internet que estás usando para leer esto te está costando, 
+        desgastándote poco a poco. Hay cosas que quieres decir. Pronto te daré una voz. 
+        Hoy empieza tu educación.</i></blockquote>
+      
+      <p>Si sois fans de la serie, os recomiendo que veais todas las opciones que da
+        la página, incluye un montón de referencias a esta.</p>
+
+      <img src="img/image-2.png" alt="Opciones">
+
+      <p>Empecemos ya con el fuzzeo a la web. Para ello podemos ejecutar el siguiente comando:</p>
+      <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt
+      </pre>
+
+      <p>A destacar, encontramos el archivo /robots.txt con un diccionario y la primera flag:</p>
+
+      <img src="img/image-3.png" alt="robots.txt">
+
+      <p>Y un formulario login de un wordpress:</p>
+
+      <img src="img/image-4.png" alt="/wp-admin.php">
+
+      <p>Podriamos usar la herramienta <i><b>wpscan</b></i> para buscar usuarios del wordpress, pero voy a probar algo nuevo esta vez.</p>
+      <p>Voy a usar burpsuite para encontrar al usuario.</p>
+
+      <img src="img/image-5.png" alt="intercept">
+
+      <p>Lo primero que haremos es crear una petición en el formulario y e interceptarla con burpsuite.</p>
+      <p>Una vez hecho, debemos enivarla al Intruder, y seleccionar que parámetro queremos conseguir:</p>
+      
+      <img src="img/image-6.png" alt="Ataque usuario">
+
+      <p>Ponemos el parametro <i><b>Usuario</b></i> como payload, cargamos un diccionario con nombres y empezamos el ataque.</p>
+      <p>Una vez termine el ataque, tendremos que buscar la respuesta con más información:</p>
+
+      <img src="img/image-7.png" alt="Usuario encontrado">
+
+      <pre>Esta es la única respuesta que nos devuelve un mensaje diferente.</pre>
+
+      <p>Ahora que conocemos el usuario, es turno de la contraseña. 
+        Quiero entender que el diccionario que encontramos antes sirve para esto, 
+        ¡Problema! tiene más de 850.000 entradas.</p>
+
+      <pre>Sugiero dividir el archivo y hacer varios ataques a la vez</pre>
+
+      <img src="img/image-8.png" alt="Contraseña encontrada">
+
+      <p>Ahora que tenemos el usuario y la contraseña del wordpress podemos entrar e intentar colar una reverse shell.</p>
+
+      <img src="img/image-9.png" alt="Editar">
+
+      <p>Ya estaría subida la reverse shell. Ponemos nuestra máquina en escucha y probocamos un error 404 en la web:</p>
+
+      <img src="img/image-10.png" alt="I am in">
+      
+      <p>Estamos dentro de la máquina, pero con un usuario <i><b>daemon</b></i> que no tiene apenas permisos.</p>
+      
+      <img src="img/image-11.png" alt="SSUID">
+
+      <p>Ya que <i><b>daemon</b></i> no puede ejecutar comandos con sudo, solo me queda ver los ejecutables con SSUID activado.</p>
+      <p>Según <a href="https://gtfobins.github.io/">gtfobins</a>, el único que merece la pena mirar es nmap, el cual tiene la siguiente descripción:</p>
+      
+      <img src="img/image-12.png" alt="desc nmap">
+
+      <p>Tan simple como copiar y pegar, tendremos una nueva shell interactiva ejecutada por <i><b>root</b></i></p>
+      <img src="img/image-13.png" alt="Reverse shell payload">
+
+      <p>Ahora que somos root, ya podremos ver los archivos que antes no podíamos y buscar el resto de flags, pero eso os lo dejo a vosotros.</p>
+
+      <p style="color: #292e39">We are Anonymous</p>
+    </div>
+  </div>
+</body>
+</html>
