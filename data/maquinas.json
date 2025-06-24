@@ -274,5 +274,11 @@
     "dificultad": "Media",
     "tipo": ["Pentesting", "Linux", "Burpsuite", "ZAP"],
     "ruta": "./rooms/mrrobot"
+  },
+  {
+    "nombre": "OhSINT",
+    "dificultad": "Fácil",
+    "tipo": ["OSINT"],
+    "ruta": "./rooms/ohsint"
   }
 ]
