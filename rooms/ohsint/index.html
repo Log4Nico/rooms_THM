@@ -2,67 +2,99 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pickle Rick - Writeup Log4Nico</title>
+  <title>OhSint - Writeup Log4Nico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Pickle Rick</h1>
+        <h1>OhSint - Write-Up</h1>
+        
+        <p>Hoy tenemos un reto algo diferente <strong>OhSint</strong> en <a href="https://tryhackme.com/room/ohsint"></a>.
+          Este desfío consiste en utilizar herramientas OSINT para encontrar información de la persona que está detras de la siguiente imagen.</p>
+        
+        <img src="img/WindowsXP_1551719014755.jpg" alt="Imagen inicial">
 
-    <div class="section">
-      <h2>Análisis</h2>
-      <p>Empezamos el análisis escaneando los puertos de la máquina:</p>
-      <img src="img/image.png" alt="Escaneo de puertos">
+        <strong>¡¡Vamos al lío!!</strong>
 
-      <p>Tenemos 2 puertos abiertos, el <strong>22</strong> con ssh y el <strong>80</strong> con apache. Si nos metemos en la página web:</p>
-      <img src="img/image-1.png" alt="Página principal">
-      <img src="img/image-2.png" alt="Página insegura">
-      <blockquote>Veremos que no es muy segura.</blockquote>
+        <h2>Análisis de la imágen</h2>
+        <p>Si tenemos que analizar a fondo una imagen, la primera herramienta que se nos viene a la cabeza es <strong>exiftool</strong>, la cual nos sirve para ver </p>
+        <img src="img/image.png" alt="EXIF">
 
-      <p>Mientras el fuzzeo se hace, probamos los típicos directorios:</p>
-      <img src="img/image-3.png" alt="Directorio especial">
-      <blockquote>Wubbalubbadubdub</blockquote>
+        <p>Lo más interesante que encontramos son los derechos de autor de la imagen. 
+          No parece un nombre real, seguramente sea un NickName. Probemos a buscarlo:</p>
 
-      <img src="img/image-4.png" alt="Directorio login">
+        <img src="img/image-1.png" alt="Página principal">
 
-      <p><code>/portal.php</code> y <code>/login.php</code> parecen ser el mismo directorio:</p>
-      <img src="img/image-5.png" alt="Login portal">
+        <p>Encontramos una cuenta de <strong>x, github y WordPress</strong>. Interesante, vayamos por orden de las preguntas.</p>
 
-      <p>Tenemos un usuario, y algo que podemos usar como contraseña:</p>
-      <img src="img/image-6.png" alt="Credenciales">
-      <blockquote>Funcionaron.</blockquote>
+        <h2>Exploración web</h2>
+        
+        <blockquote><i>What is the user's avatar of?</i></blockquote>
 
-      <p>Parece ser una consola que ejecuta comandos en el servidor:</p>
-      <img src="img/image-7.png" alt="Consola comandos">
+        <p>Esta pregunta la podemos resolver entrando en su cuenta de X:</p>
 
-      <p>Hagamos una búsqueda sencilla de algo útil:</p>
-      <img src="img/image-8.png" alt="Búsqueda ingrediente 1">
-      <img src="img/image-9.png" alt="Ingrediente 1">
-      <blockquote>cat no funciona en esta terminal, pero less si. Primer ingrediente.</blockquote>
+        <img src="img/image-2.png" alt="X">
 
-      <img src="img/image-10.png" alt="Búsqueda ingrediente 2">
-      <img src="img/image-11.png" alt="Ingrediente 2">
-      <blockquote>Segundo ingrediente.</blockquote>
+        <i>> cat</i>
 
-      <p>Lo más seguro es que el último ingrediente esté en <code>/root</code>, y lo mejor sería hacerlo desde una terminal en condiciones.</p>
-      <img src="img/image-12.png" alt="Preparar reverse shell">
+        <p>Además de su foto de perfil, encontramos una publicación en la cual expone su BSSID. Esto nos ayudará con la siguiente pregunta.</p>
 
-      <p>En el servidor está instalado php, por lo que podríamos hacer una reverse shell. En <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md" target="_blank">Payload All The Things</a> podemos encontrar el siguiente comando para crearnos una reverse shell:</p>
-      <img src="img/image-13.png" alt="Reverse shell payload">
-      <blockquote>Tenemos que cambiar la IP (poner la nuestra del túnel) y el puerto solamente si queremos.</blockquote>
+        <img src="img/image-3.png" alt="BSSID">
 
-      <img src="img/image-14.png" alt="Reverse shell lanzada">
-      <img src="img/image-15.png" alt="Shell mejorada">
+        <blockquote><i>What city is this person in?</i></blockquote>
 
-      <p>Ahora podremos trabajar mejor. Hagamos un escalado de privilegios, primero vemos los permisos que tiene el usuario: <pre>www-data</pre></p>
-      <img src="img/image-16.png" alt="Permisos www-data">
-      <blockquote>Tiene todos los permisos.</blockquote>
+        <p>Con la información que sacamos en la imagen anterior, podemos encontrar el lugar de residencia de la persona que está detras de todo esto.</p>
+        <p>Para ello usaré la herramienta online <a href="https://wigle.net/"><strong>wigle.net</strong></a>.</p>
 
-      <p>Iniciamos sesión con root directamente y vemos su directorio:</p>
-      <img src="img/image-17.png" alt="Ingrediente final">
-      <blockquote>Último ingrediente.</blockquote>
+        <img src="img/image-4.png" alt="Ciudad">
+
+        <i>> London</i>
+
+        <blockquote><i>What is the SSID of the WAP he connected to?</i></blockquote>
+
+        <p>Para resolver esta pregunta, podemos usar la misma web, pero debemos registrarnos para poder usar todas funciones que nos ofrece.</p>
+
+        <img src="img/image-5.png" alt="SSID">
+
+        <i>> UnileverWiFi</i>
+
+        <p>¡Ojo! Es obligatorio hacer clic lo más cerca posible al punto, podría no darnos la información que realmente queremos.</p>
+
+        <blockquote><i>What is his personal email address?</i></blockquote>
+
+        <p>Cambiemos ahora la fuente de nuestra información y vayamos a su GitHub:</p>
+
+        <img src="img/image-6.png" alt="GitHub">
+
+        <p>Aquí volvemos a encontrar su cuenta de X y WordPress, además de su correo personal</p>
+
+        <i>> OWoodflint@gmail.com</i>
+
+        <blockquote><i>What site did you find his email address on?</i></blockquote>
+
+        <p>Esta pregunta la acabamos de resolver, la hemos encontrado en su cuenta de GitHub</p>
+
+        <i>> Github</i>
+
+        <blockquote><i>Where has he gone on holiday?</i></blockquote>
+
+        <p>No se encuentra nada relevante en sus commits, veamos su página web:</p>
+
+        <img src="img/image-7.png" alt="/home">
+
+        <p>Oliver lleva más de 6 años de vacaciones en Nueva York, bien por él.</p>
+
+        <i>> NEW YORK</i>
+
+        <blockquote><i>What is the person's password?</i></blockquote>
+
+        <p>No mentiré, estuve un buen rato buscando la contraseña, comentarios de las publicaciones, commits antiguos, nada.</p>
+        <p>De no ser porque, por error, seleccioné toda la página, no la habría encontrado:</p>
+      
+        <img src="img/image-8.png" alt="Contraseña encontrada">
+
+        <p>Y ya habríamos terminado este desafío de OSINT. Es un reto básico pero muy bueno para empezar y recordar herramientas viejas.</p>
     </div>
-  </div>
 </body>
 </html>
