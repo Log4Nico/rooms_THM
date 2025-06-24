@@ -67,102 +67,73 @@
 </head>
 <body>
   <div class="container">
-    <h1>Mr. Robot</h1>
-    <p>En este reto tematizado de <b>Mr. Robot</b> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina a traves de 
-      Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que me permite automatizar el envío 
-      de múltiples peticiones de login y analizar las respuestas para detectar posibles accesos válidos, todo sin desvelar detalles concretos del reto.</p>
+        <h1>Mr. Robot - Write-Up</h1>
+        <p>En este reto tematizado de <strong>Mr. Robot</strong> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina. Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que permite automatizar el envío de múltiples peticiones de login y analizar las respuestas para detectar accesos válidos.</p>
 
-    <div class="section">
-      <h2>Análisis</h2>
-      <p>Empezamos el análisis escaneando los puertos de la máquina:</p>
-      <img src="img/image.png" alt="Escaneo de puertos">
+        <h2>Análisis inicial</h2>
+        <p>Empezamos escaneando los puertos de la máquina:</p>
+        <img src="img/image.png" alt="Escaneo de puertos">
 
-      <p>Encontramos 3 puertos abiertos:</p>
-      <ul>
-        <li>Puerto 22  - SSH</li>
-        <li>Puerto 80  - Apache http</li>
-        <li>Puerto 443 - Apache https</li>
-      </ul>
+        <ul>
+            <li>Puerto 22 - SSH</li>
+            <li>Puerto 80 - Apache HTTP</li>
+            <li>Puerto 443 - Apache HTTPS</li>
+        </ul>
 
-      <blockquote>Os adelanto que los 2 servicios web alojan la misma página.</blockquote>
+        <blockquote>Ambos servicios web alojan la misma página.</blockquote>
 
-      <p>Vamos a ver que tipo de página web encontramos:</p>
-      <img src="img/image-1.png" alt="Pagina principal">
+        <h2>Exploración web</h2>
+        <img src="img/image-1.png" alt="Página principal">
 
-      <blockquote><i>Hola, amigo. Si has llegado, has llegado por una razón. 
-        Puede que aún no puedas explicarlo, pero hay una parte de ti que está 
-        agotada de este mundo... un mundo que decide dónde trabajas, 
-        a quién ves y cómo vacías y llenas tu deprimente cuenta bancaria. 
-        Incluso la conexión a Internet que estás usando para leer esto te está costando, 
-        desgastándote poco a poco. Hay cosas que quieres decir. Pronto te daré una voz. 
-        Hoy empieza tu educación.</i></blockquote>
-      
-      <p>Si sois fans de la serie, os recomiendo que veais todas las opciones que da
-        la página, incluye un montón de referencias a esta.</p>
+        <blockquote>Hola, amigo. Si has llegado, has llegado por una razón... Hoy empieza tu educación.</blockquote>
 
-      <img src="img/image-2.png" alt="Opciones">
+        <p>Si sois fans de la serie, os recomiendo explorar todas las opciones que ofrece la página. Está repleta de referencias.</p>
+        <img src="img/image-2.png" alt="Opciones">
 
-      <p>Empecemos ya con el fuzzeo a la web. Para ello podemos ejecutar el siguiente comando:</p>
-      <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt
-      </pre>
+        <h2>Fuzzing</h2>
+        <p>Ejecutamos un fuzzeo básico:</p>
+        <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt</pre>
 
-      <p>A destacar, encontramos el archivo /robots.txt con un diccionario y la primera flag:</p>
+        <p>Encontramos <code>/robots.txt</code> con un diccionario y una flag:</p>
+        <img src="img/image-3.png" alt="robots.txt">
 
-      <img src="img/image-3.png" alt="robots.txt">
+        <p>También vemos el formulario de login de WordPress:</p>
+        <img src="img/image-4.png" alt="WordPress login">
 
-      <p>Y un formulario login de un wordpress:</p>
+        <h2>Fuerza bruta de credenciales</h2>
+        <p>Decidí usar Burp Suite para encontrar el usuario.</p>
+        <img src="img/image-5.png" alt="Intercept">
 
-      <img src="img/image-4.png" alt="/wp-admin.php">
+        <p>Tras interceptar la petición, la enviamos a Intruder y lanzamos el ataque con una lista de usuarios:</p>
+        <img src="img/image-6.png" alt="Ataque usuario">
 
-      <p>Podriamos usar la herramienta <i><b>wpscan</b></i> para buscar usuarios del wordpress, pero voy a probar algo nuevo esta vez.</p>
-      <p>Voy a usar burpsuite para encontrar al usuario.</p>
+        <p>Identificamos una respuesta diferente que revela el usuario correcto:</p>
+        <img src="img/image-7.png" alt="Usuario encontrado">
 
-      <img src="img/image-5.png" alt="intercept">
+        <p>Ahora a por la contraseña. Usaré el mismo metodo de antes, pero ahora sabiendo el nombre de usuario. 
+          El diccionario que encontramos antes, tiene más de 850.000 entradas, así que lo divido para acelerar.</p>
+        <img src="img/image-8.png" alt="Contraseña encontrada">
 
-      <p>Lo primero que haremos es crear una petición en el formulario y e interceptarla con burpsuite.</p>
-      <p>Una vez hecho, debemos enivarla al Intruder, y seleccionar que parámetro queremos conseguir:</p>
-      
-      <img src="img/image-6.png" alt="Ataque usuario">
+        <h2>Acceso y reverse shell</h2>
+        <p>Con las credenciales accedemos a WordPress y subimos una reverse shell.</p>
+        <img src="img/image-9.png" alt="Subida reverse shell">
 
-      <p>Ponemos el parametro <i><b>Usuario</b></i> como payload, cargamos un diccionario con nombres y empezamos el ataque.</p>
-      <p>Una vez termine el ataque, tendremos que buscar la respuesta con más información:</p>
+        <p>Provocamos un error 404 para ejecutarla:</p>
+        <img src="img/image-10.png" alt="Ejecución de reverse shell">
 
-      <img src="img/image-7.png" alt="Usuario encontrado">
+        <h2>Escalada de privilegios</h2>
+        <p>Estamos dentro como el usuario <code>daemon</code>, el cual no puede ejecutar sudo. Revisamos binarios con SUID:</p>
+        <img src="img/image-11.png" alt="SUIDs encontrados">
 
-      <pre>Esta es la única respuesta que nos devuelve un mensaje diferente.</pre>
+        <p>Con <a href="https://gtfobins.github.io/">GTFOBins</a> descubrimos que podemos usar <code>nmap</code> para escalar privilegios:</p>
+        <img src="img/image-12.png" alt="Uso de Nmap para root">
 
-      <p>Ahora que conocemos el usuario, es turno de la contraseña. 
-        Quiero entender que el diccionario que encontramos antes sirve para esto, 
-        ¡Problema! tiene más de 850.000 entradas.</p>
+        <p>Y finalmente conseguimos una shell como root:</p>
+        <img src="img/image-13.png" alt="Shell root">
 
-      <pre>Sugiero dividir el archivo y hacer varios ataques a la vez</pre>
+        <p>Ahora puedes buscar las flags restantes… ¡te toca!</p>
 
-      <img src="img/image-8.png" alt="Contraseña encontrada">
-
-      <p>Ahora que tenemos el usuario y la contraseña del wordpress podemos entrar e intentar colar una reverse shell.</p>
-
-      <img src="img/image-9.png" alt="Editar">
-
-      <p>Ya estaría subida la reverse shell. Ponemos nuestra máquina en escucha y probocamos un error 404 en la web:</p>
-
-      <img src="img/image-10.png" alt="I am in">
-      
-      <p>Estamos dentro de la máquina, pero con un usuario <i><b>daemon</b></i> que no tiene apenas permisos.</p>
-      
-      <img src="img/image-11.png" alt="SSUID">
-
-      <p>Ya que <i><b>daemon</b></i> no puede ejecutar comandos con sudo, solo me queda ver los ejecutables con SSUID activado.</p>
-      <p>Según <a href="https://gtfobins.github.io/">gtfobins</a>, el único que merece la pena mirar es nmap, el cual tiene la siguiente descripción:</p>
-      
-      <img src="img/image-12.png" alt="desc nmap">
-
-      <p>Tan simple como copiar y pegar, tendremos una nueva shell interactiva ejecutada por <i><b>root</b></i></p>
-      <img src="img/image-13.png" alt="Reverse shell payload">
-
-      <p>Ahora que somos root, ya podremos ver los archivos que antes no podíamos y buscar el resto de flags, pero eso os lo dejo a vosotros.</p>
-
-      <p style="color: #292e39">We are Anonymous</p>
+        <blockquote style="color:#222; font-weight: bold;">fsociety</blockquote>
     </div>
-  </div>
 </body>
 </html>
