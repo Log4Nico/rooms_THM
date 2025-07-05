@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mr. Robot - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+        <h1>Mr. Robot - Write-Up</h1>
+        <p>En este reto tematizado de <strong>Mr. Robot</strong> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina. Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que permite automatizar el envío de múltiples peticiones de login y analizar las respuestas para detectar accesos válidos.</p>
+
+        <h2>Análisis inicial</h2>
+        <p>Empezamos escaneando los puertos de la máquina:</p>
+        <img src="img/image.png" alt="Escaneo de puertos">
+
+        <ul>
+            <li>Puerto 22 - SSH</li>
+            <li>Puerto 80 - Apache HTTP</li>
+            <li>Puerto 443 - Apache HTTPS</li>
+        </ul>
+
+        <blockquote>Ambos servicios web alojan la misma página.</blockquote>
+
+        <h2>Exploración web</h2>
+        <img src="img/image-1.png" alt="Página principal">
+
+        <blockquote>Hola, amigo. Si has llegado, has llegado por una razón... Hoy empieza tu educación.</blockquote>
+
+        <p>Si sois fans de la serie, os recomiendo explorar todas las opciones que ofrece la página. Está repleta de referencias.</p>
+        <img src="img/image-2.png" alt="Opciones">
+
+        <h2>Fuzzing</h2>
+        <p>Ejecutamos un fuzzeo básico:</p>
+        <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt</pre>
+
+        <p>Encontramos <code>/robots.txt</code> con un diccionario y una flag:</p>
+        <img src="img/image-3.png" alt="robots.txt">
+
+        <p>También vemos el formulario de login de WordPress:</p>
+        <img src="img/image-4.png" alt="WordPress login">
+
+        <h2>Fuerza bruta de credenciales</h2>
+        <p>Decidí usar Burp Suite para encontrar el usuario.</p>
+        <img src="img/image-5.png" alt="Intercept">
+
+        <p>Tras interceptar la petición, la enviamos a Intruder y lanzamos el ataque con una lista de usuarios:</p>
+        <img src="img/image-6.png" alt="Ataque usuario">
+
+        <p>Identificamos una respuesta diferente que revela el usuario correcto:</p>
+        <img src="img/image-7.png" alt="Usuario encontrado">
+
+        <p>Ahora a por la contraseña. Usaré el mismo metodo de antes, pero ahora sabiendo el nombre de usuario. 
+          El diccionario que encontramos antes, tiene más de 850.000 entradas, así que lo divido para acelerar.</p>
+        <img src="img/image-8.png" alt="Contraseña encontrada">
+
+        <h2>Acceso y reverse shell</h2>
+        <p>Con las credenciales accedemos a WordPress y subimos una reverse shell.</p>
+        <img src="img/image-9.png" alt="Subida reverse shell">
+
+        <p>Provocamos un error 404 para ejecutarla:</p>
+        <img src="img/image-10.png" alt="Ejecución de reverse shell">
+
+        <h2>Escalada de privilegios</h2>
+        <p>Estamos dentro como el usuario <code>daemon</code>, el cual no puede ejecutar sudo. Revisamos binarios con SUID:</p>
+        <img src="img/image-11.png" alt="SUIDs encontrados">
+
+        <p>Con <a href="https://gtfobins.github.io/">GTFOBins</a> descubrimos que podemos usar <code>nmap</code> para escalar privilegios:</p>
+        <img src="img/image-12.png" alt="Uso de Nmap para root">
+
+        <p>Y finalmente conseguimos una shell como root:</p>
+        <img src="img/image-13.png" alt="Shell root">
+
+        <p>Ahora puedes buscar las flags restantes… ¡te toca!</p>
+
+        <blockquote style="color:#222; font-weight: bold;">fsociety</blockquote>
+    </div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MemLabs - 0 - Writeup Log4Nico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+        <h1>MemLabs - 0 - Write-Up</h1>
+        <p>En este write-up, me adentro en los retos de <a href="https://github.com/stuxnet999/MemLabs">MemLabs</a>, una serie de laboratorios diseñados para poner a prueba 
+          nuestras habilidades en el análisis de volcados de memoria. Equipado con <b>Volatility</b>, una de las herramientas 
+          más potentes para diseccionar sistemas vivos o caídos, iré desenterrando credenciales, procesos sospechosos, 
+          conexiones de red y cualquier pista que hayan dejado atrás.</p>
+
+        <p>Este primer reto <a href="https://github.com/stuxnet999/MemLabs/tree/master/Lab%200">MemLabs Lab 0 - Never Too Late Mister</a>, se trata de un desafío introductorio, 
+          empezaremos con cosas muy simplonas y acabaremos con puzzles más complejos</p>
+
+        <p>No me enrollo más y voy a empezar con la resolución del desafio:</p>
+
+        <h2>Enunciado</h2>
+
+        <p>Mi amigo John es un activista "ambiental"(traducción de "environmental") y un humanitario. Detestaba la ideología de Thanos en Avengers: Infinity War. 
+          Es un desastre programando: usaba demasiadas variables en cualquier programa que escribía. Un día, John me entregó un 
+          volcado de memoria y me pidió que averiguara qué estaba haciendo en el momento en que lo generó. ¿Puedes descubrirlo por mí?</p>
+
+        <h2>Análisis del perfil</h2>
+
+        <p>Lo primero que tenemos que hacer cuando estamos analizando un archivo de memoria, es buscar el perfil de la memoria.
+          Para entendernos, el <i>perfil</i> es como está estructurada la memoria RAM o el idioma en el que está escrita.</p>
+        
+        <p>Para sacar la memoria debemos usar el siguiente comando:</p>
+
+        <code>vol.py -f Challenge.raw imageinfo</code>
+
+        <p>Al hacer esto, <i>y esperar un poco,</i> la herramienta nos devolverá el siguiente resultado:</p>
+
+        <img src="img/image.png" alt="Perfiles">
+
+        <p>La herramienta nos ha devulto varios perfiles de memoria que podrían ser el correcto.</p>
+        <pre>Yo siempre suelo comprobar todos los perfiles y todos me dan el mismo resultado, lo mejor es apuntarlos en un bloc de notas 
+          y cuando falle probar con otra</pre>
+        
+        <h2>Análisis de la memoria</h2>
+
+        <p>En el enunciado podemos encontrar varias pistas de donde tenemos que mirar para sacar las "flags":</p>
+        <ul>
+          <li>environmental + Thanos</li>
+          <li>¿Qué estaba haciendo John mientras volcava la memoria?</li>
+        </ul>
+
+        <p>Con esto en mente, podemos empezar a buscar.</p>
+
+        <p>Empezaré buscando en las variables de entorno con el siguiente comando:</p>
+
+        <code>vol.py -f Challenge.raw --profile=Win7SP1x86 envars</code>
+
+        <img src="img/image-1.png" alt="envars">
+
+        <p>Evidentemente, no podemos ver nada aquí porque la herramienta nos está dando todas las variables del sistema cargadas en la memoria.</p>
+        <p>Debemos filtrar el resultado, por ejemplo con la palabra "Thanos":</p>
+
+        <img src="img/image-2.png" alt="envars filtrado">
+
+        <p>xor + contraseña, ¿Qué significará?</p>
+
+        <p>Lo único que se me ocurre, es descifrar la contraseña <i>hasheada</i> del usuario. Para ello usamos el siguiente comando:</p>
+
+        <code>vol.py -f Challenge.raw --profile=Win7SP1x86 hashdump</code>
+
+        <img src="img/image-3.png" alt="hashdump">
+
+        <p>Ahora debemos descifrar la parte señalada con alguna herramienta, yo usaré la herramienta online <a href="https://hashes.com/en/decrypt/hash"></a>hashes.com</p>
+        
+        <img src="img/image-4.png" alt="Primera parte">
+
+        <p>Genial, solo nos queda la segunda parte de la flag para terminar el reto.</p>
+        <p>El enunciado nos pedía ver que estaba haciendo John mientras generaba el volcado de la memoria. Esto lo podemos hacer con:</p>
+
+        <h2>pslist</h2>
+
+        <img src="img/image-5.png" alt="pslist">
+        <pre>Nada raro</pre>
+
+        <h2>cmdline</h2>
+
+        <img src="img/image-6.png" alt="cmdline">
+        
+        <pre>Creo que tampoco hay nada raro</pre>
+
+        <h2>consoles</h2>
+
+        <img src="img/image-7.png" alt="consoles">
+
+        <pre>Encontramos la ejecución de un script de python que devolvió un resultado</pre>
+
+        <p>Prabablemente, este resultado sea la segunda parte de la flag, probemos a descifrarlo con cyberchef:</p>
+
+        <img src="img/image-8.png" alt="Segunda parte">
+
+        <p>Y ahí tenemos la segunda y última parte de la flag, acabando así con la introducción a los MemLabs</p>
+        <p>Ahora podemos avanzar a los retos principales, donde se encuentran los desafíos más interesantes y complejos.</p>
+        <a href="../Memlabs - Lab 1/index.html"></a>
+    </div>
+</body>
+</html>

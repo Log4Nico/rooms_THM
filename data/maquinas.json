@@ -280,5 +280,11 @@
     "dificultad": "Fácil",
     "tipo": ["OSINT"],
     "ruta": "./rooms/ohsint"
+  },
+  {
+    "nombre": "MemLabs - Lab 0",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 0"
   }
 ]
