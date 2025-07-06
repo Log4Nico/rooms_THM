@@ -2,79 +2,128 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mr. Robot - Writeup Log4Nico</title>
+  <title>MemLabs - 1 - Writeup Log4Nico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="container">
-        <h1>Mr. Robot - Write-Up</h1>
-        <p>En este reto tematizado de <strong>Mr. Robot</strong> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina. Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que permite automatizar el envío de múltiples peticiones de login y analizar las respuestas para detectar accesos válidos.</p>
+        <h1>MemLabs - 1 - Write-Up</h1>
+        <p>En este write-up, me adentro en los retos de <a href="https://github.com/stuxnet999/MemLabs">MemLabs</a>, una serie de laboratorios diseñados para poner a prueba 
+          nuestras habilidades en el análisis de volcados de memoria. Equipado con <b>Volatility</b>, una de las herramientas 
+          más potentes para diseccionar sistemas vivos o caídos, iré desenterrando credenciales, procesos sospechosos, 
+          conexiones de red y cualquier pista que hayan dejado atrás.</p>
 
-        <h2>Análisis inicial</h2>
-        <p>Empezamos escaneando los puertos de la máquina:</p>
-        <img src="img/image.png" alt="Escaneo de puertos">
+        <p>Ahora si, nos encontramos delante del primer reto del laboratiorio: <a href="https://github.com/stuxnet999/MemLabs/tree/master/Lab%201">MemLabs Lab 1 - Beginner's Luck</a>.
+          El anterior consistía en una prueba de concepto, ver si nos funciona la herramienta, si sabemos usarla, etc. Aunque este desafio esté catalogado como <i>fácil</i>, 
+          hay que tener en cuenta una cosa: Nada es realmente <b>fácil</b>, simplemente el que ha hecho los retos tiene más práctica que el resto</p>
 
+        <h2>Enunciado</h2>
+
+        <p>El ordenador de mi hermana crasheo. Tuvimos mucha suerte de poder recuperar este volcado de memoria. 
+          Tu tarea es recuperar todos sus archivos importantes del sistema. Por lo que recordamos, de repente apareció 
+          una ventana negra con algo ejecutándose. Cuando ocurrió el fallo, ella estaba intentando dibujar algo. 
+          Eso es todo lo que recordamos del momento del accidente.</p>
+        
+        <h2>¿Qué sacamos en claro?</h2>
         <ul>
-            <li>Puerto 22 - SSH</li>
-            <li>Puerto 80 - Apache HTTP</li>
-            <li>Puerto 443 - Apache HTTPS</li>
+          <li>Debemos ver los archivos del usuario.</li>
+          <li>Apareció una ventana negra(cmd).</li>
+          <li>Estaba dibujando algo(programa/procesos relacionados con pintar).</li>
         </ul>
 
-        <blockquote>Ambos servicios web alojan la misma página.</blockquote>
+        <p>Además, este reto consta de 3 flags.</p>
 
-        <h2>Exploración web</h2>
-        <img src="img/image-1.png" alt="Página principal">
+        <h2>Análisis del perfil</h2>
+        
+        <p>Para sacar la memoria debemos usar el siguiente comando:</p>
 
-        <blockquote>Hola, amigo. Si has llegado, has llegado por una razón... Hoy empieza tu educación.</blockquote>
+        <code>vol.py -f MemoryDump_Lab1.raw imageinfo</code>
 
-        <p>Si sois fans de la serie, os recomiendo explorar todas las opciones que ofrece la página. Está repleta de referencias.</p>
-        <img src="img/image-2.png" alt="Opciones">
+        <p>Al hacer esto, nos saldrá lo siguiente:</p>
 
-        <h2>Fuzzing</h2>
-        <p>Ejecutamos un fuzzeo básico:</p>
-        <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt</pre>
+        <img src="img/image.png" alt="Perfiles">
 
-        <p>Encontramos <code>/robots.txt</code> con un diccionario y una flag:</p>
-        <img src="img/image-3.png" alt="robots.txt">
+        <p>Yo me quedaré con el perfil <b>Win7SP1x64</b>, ya que es el que menos problemas me dió al principio.</p>
+        
+        <h2>Análisis de la memoria</h2>
 
-        <p>También vemos el formulario de login de WordPress:</p>
-        <img src="img/image-4.png" alt="WordPress login">
+        <p>Como aclaré antes, debemos buscar 3 flags que concuerdan con los puntos principales del enunciado. Así que vamos a hacer uno por uno.</p>
+        
+        <h3>Archivos del usuario</h3>
 
-        <h2>Fuerza bruta de credenciales</h2>
-        <p>Decidí usar Burp Suite para encontrar el usuario.</p>
-        <img src="img/image-5.png" alt="Intercept">
+        <p>Para ver los archivos cargados en memoria, debemos usar el siguiente comando:</p>
 
-        <p>Tras interceptar la petición, la enviamos a Intruder y lanzamos el ataque con una lista de usuarios:</p>
-        <img src="img/image-6.png" alt="Ataque usuario">
+        <code>vol.py -f MemoryDump_Lab1.raw --profile=Win7SP1x64 filescan</code>
 
-        <p>Identificamos una respuesta diferente que revela el usuario correcto:</p>
-        <img src="img/image-7.png" alt="Usuario encontrado">
+        <p>Esto nos devolverá un listado enorme de archivos cargados en la memoria, vamos a buscar algo con lo que poder filtrar.</p>
+        
+        <p>Con <i>cmdline</i> encontramos el siguiente archivo .rar</p>
 
-        <p>Ahora a por la contraseña. Usaré el mismo metodo de antes, pero ahora sabiendo el nombre de usuario. 
-          El diccionario que encontramos antes, tiene más de 850.000 entradas, así que lo divido para acelerar.</p>
-        <img src="img/image-8.png" alt="Contraseña encontrada">
+        <img src="img/image-1.png" alt="cmdline .rar">
 
-        <h2>Acceso y reverse shell</h2>
-        <p>Con las credenciales accedemos a WordPress y subimos una reverse shell.</p>
-        <img src="img/image-9.png" alt="Subida reverse shell">
+        <p>Si tuviera otro nombre ni le haría caso en un principio, pero literalmente se llama <b>IMPORTANTE.rar</b></p>
 
-        <p>Provocamos un error 404 para ejecutarla:</p>
-        <img src="img/image-10.png" alt="Ejecución de reverse shell">
+        <p>Ahora que tenemos algo con lo que poder filtrar, vamos a ver si el archivo está realmente cargado en memoria:</p>
 
-        <h2>Escalada de privilegios</h2>
-        <p>Estamos dentro como el usuario <code>daemon</code>, el cual no puede ejecutar sudo. Revisamos binarios con SUID:</p>
-        <img src="img/image-11.png" alt="SUIDs encontrados">
+        <img src="img/image-2.png" alt="filescan filtrado">
 
-        <p>Con <a href="https://gtfobins.github.io/">GTFOBins</a> descubrimos que podemos usar <code>nmap</code> para escalar privilegios:</p>
-        <img src="img/image-12.png" alt="Uso de Nmap para root">
+        <p>Vemos que sí que está cargado, pero hay 3 archivos. Debemos extraerlos todos y ver cual es el correcto.</p>
 
-        <p>Y finalmente conseguimos una shell como root:</p>
-        <img src="img/image-13.png" alt="Shell root">
+        <p>Para extraer los archivos, necesitaremos usar el comando <code>dumpfiles</code> de Volatility, indicando la ruta en memoria del archivo. Por ejemplo:</p>
 
-        <p>Ahora puedes buscar las flags restantes… ¡te toca!</p>
+        <code>vol.py -f MemoryDump_Lab1.raw --profile=Win7SP1x64 dumpfiles -Q 0x000000003fa3ebc0 -D ./exports</code>
 
-        <blockquote style="color:#222; font-weight: bold;">fsociety</blockquote>
+        <p>Esto nos devolverá un archivo con un nombre extraño, podemos cambiarle el nombre sin problemas a "important.rar" y facilitarnos el trabajo</p>
+
+        <pre>Os adelanto que el correcto es el primero.</pre>
+
+        <p>Al intentar extraerlo, nos devolverá el siguiente comentario:</p>
+
+        <img src="img/image-3.png" alt="unrar">
+
+        <p>La contraseña del archivo es el hash NTLM del usuario "Alissa" en mayusculas.</p>
+
+        <p>Podemos usar el comando que vimos en el laboratiorio anterior para conseguir el hash:</p>
+        
+        <img src="img/image-4.png" alt="hash NTLM">
+
+        <p>Ponemos todo eso en mayusculas como la contraseña del archivo y conseguimos la tercera flag.</p>
+
+        <h3>Ventana negra (cmd)</h3>
+
+        <p>Debemos usar diferentes opciones de volatility que nos permitan ver información orientada a la consola de comandos.</p>
+
+        <p>La primera que usé fue <i>consoles</i>, y resultó ser la correcta</p>
+
+        <img src="img/image-5.png" alt="consoles">
+
+        <p>Encontramos la primera flag del reto cifrada en base64</p>
+
+        <h3>Programas para pintar</h3>
+
+        <p>Por último, tenemos la flag más rebuscada en mi opinión. Empecemos por buscar ese programa usado para pintar.</p>
+        <p>Podemos usar las opciones <i>pslist/pstree o psscan</i>. Con esta última, aparece el siguiente proceso:</p>
+
+        <img src="img/image-6.png" alt="mspaint">
+        
+        <pre>Programa nativo de windows para dibujar</pre>
+
+        <p>Ahora, debemos extraer el proceso usando memdump:</p>
+
+        <img src="img/image-7.png" alt="memdump">
+
+        <p>Y por último, tenemos que abrir este archivo con gimp:</p>
+
+        <img src="img/image-8.png" alt="Segunda flag">
+
+        <pre>No conseguí que se viese mejor</pre>
+
+        <p>Esta flag consiste en entender como funcionan los procesos. Como estaban dibujando algo cuando crasheo el PC, en memoria se guardó 
+          información de lo que estaban haciendo, entonces, el proceso del mspaint guardó lo que estaban dibujando.</p>
+        
+        <a href="../Memlabs - Lab 1/index.html">Ir al laboratorio anterior</a>
+        <a href="../Memlabs - Lab 1/index.html">Ir al siguiente laboratorio</a>
     </div>
 </body>
 </html>

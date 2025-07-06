@@ -286,5 +286,41 @@
     "dificultad": "Fácil",
     "tipo": ["Forense", "Memoria"],
     "ruta": "./rooms/Memlabs - Lab 0"
+  },
+  {
+    "nombre": "MemLabs - Lab 1",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 1"
+  },
+  {
+    "nombre": "MemLabs - Lab 2",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 2"
+  },
+  {
+    "nombre": "MemLabs - Lab 3",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 3"
+  },
+  {
+    "nombre": "MemLabs - Lab 4",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 4"
+  },
+  {
+    "nombre": "MemLabs - Lab 5",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 5"
+  },
+  {
+    "nombre": "MemLabs - Lab 6",
+    "dificultad": "Fácil",
+    "tipo": ["Forense", "Memoria"],
+    "ruta": "./rooms/Memlabs - Lab 6"
   }
 ]
