@@ -2,79 +2,102 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mr. Robot - Writeup Log4Nico</title>
+  <title>MemLabs - 3 - Writeup Log4Nico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="container">
-        <h1>Mr. Robot - Write-Up</h1>
-        <p>En este reto tematizado de <strong>Mr. Robot</strong> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina. Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que permite automatizar el envío de múltiples peticiones de login y analizar las respuestas para detectar accesos válidos.</p>
+        <h1>MemLabs - 3 - Write-Up</h1>
+        <p>En este write-up, me adentro en los retos de <a href="https://github.com/stuxnet999/MemLabs">MemLabs</a>, una serie de laboratorios diseñados para poner a prueba 
+          nuestras habilidades en el análisis de volcados de memoria. Equipado con <b>Volatility</b>, una de las herramientas 
+          más potentes para diseccionar sistemas vivos o caídos, iré desenterrando credenciales, procesos sospechosos, 
+          conexiones de red y cualquier pista que hayan dejado atrás.</p>
 
-        <h2>Análisis inicial</h2>
-        <p>Empezamos escaneando los puertos de la máquina:</p>
-        <img src="img/image.png" alt="Escaneo de puertos">
+        <p>Continuamos con los desafíos de Forensic Ram. En esta ocasión nos encontramos ante <a href="https://github.com/stuxnet999/MemLabs/tree/master/Lab%203">MemLabs Lab 3 - The Evil’s Den</a>.
+          Este reto supone una dificultad media, empezando así con los retos un poco más complejos.</p>
 
+        <h2>Enunciado</h2>
+
+        <p>Un script malicioso a encriptado una información muy secreta que tenía en mi sistema. ¿Puedes recuperarla por favor?</p>
+        
+        <h2>¿Qué sacamos en claro?</h2>
         <ul>
-            <li>Puerto 22 - SSH</li>
-            <li>Puerto 80 - Apache HTTP</li>
-            <li>Puerto 443 - Apache HTTPS</li>
+          <li>Script malicioso(probablemente se ejecutó por consola).</li>
+          <li>Información secreta(Mirar archivos).</li>
         </ul>
 
-        <blockquote>Ambos servicios web alojan la misma página.</blockquote>
+        <p>Además, este reto consta de 1 flag dividia en 2 partes, y para resolverlo necesitaremos la herramienta de estenografía <i>steghide</i>.</p>
 
-        <h2>Exploración web</h2>
-        <img src="img/image-1.png" alt="Página principal">
+        <h2>Análisis del perfil</h2>
+        
+        <p>Para sacar la memoria debemos usar el siguiente comando:</p>
 
-        <blockquote>Hola, amigo. Si has llegado, has llegado por una razón... Hoy empieza tu educación.</blockquote>
+        <code>vol.py -f MemoryDump_Lab3.raw imageinfo</code>
 
-        <p>Si sois fans de la serie, os recomiendo explorar todas las opciones que ofrece la página. Está repleta de referencias.</p>
-        <img src="img/image-2.png" alt="Opciones">
+        <p>Al hacer esto, nos saldrá lo siguiente:</p>
 
-        <h2>Fuzzing</h2>
-        <p>Ejecutamos un fuzzeo básico:</p>
-        <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt</pre>
+        <img src="img/image.png" alt="Perfiles">
 
-        <p>Encontramos <code>/robots.txt</code> con un diccionario y una flag:</p>
-        <img src="img/image-3.png" alt="robots.txt">
+        <p>Como ya he dicho varias veces, podemos usar cualquira de estas.</p>
+        
+        <h2>Análisis de la memoria</h2>
 
-        <p>También vemos el formulario de login de WordPress:</p>
-        <img src="img/image-4.png" alt="WordPress login">
+        <p>Dividir este análisis en secciones es una tarea complicada, ya que el enunciado nos ha dicho más bien poco. Lo haré según los puntos que saqué antes.</p>
+        
+        <h3>script malicioso</h3>
 
-        <h2>Fuerza bruta de credenciales</h2>
-        <p>Decidí usar Burp Suite para encontrar el usuario.</p>
-        <img src="img/image-5.png" alt="Intercept">
+        <p>Buscar archivos así a lo loco sin nada con lo que filtrar es una perdida de tiempo. Sabemos que estamos buscando un script, pero no sabemos la extensión. Aún así, sabemos
+          que los scripts se tienen que ejecutar por consola, por lo que podemos primero hacer un listado de los comandos que se ejecutaron:</p>
 
-        <p>Tras interceptar la petición, la enviamos a Intruder y lanzamos el ataque con una lista de usuarios:</p>
-        <img src="img/image-6.png" alt="Ataque usuario">
+        <img src="img/image-1.png" alt="cmdline">
 
-        <p>Identificamos una respuesta diferente que revela el usuario correcto:</p>
-        <img src="img/image-7.png" alt="Usuario encontrado">
+        <pre>Para hacer la busqueda usé el parámetro <b>cmdline</b>.</pre>
 
-        <p>Ahora a por la contraseña. Usaré el mismo metodo de antes, pero ahora sabiendo el nombre de usuario. 
-          El diccionario que encontramos antes, tiene más de 850.000 entradas, así que lo divido para acelerar.</p>
-        <img src="img/image-8.png" alt="Contraseña encontrada">
+        <p>Vaya, <b>NOTEPAD.EXE</b> ejecutó evilscript.py y vip.txt. Ya tenemos 2 cosas que buscar, hagamoslo con un <i>filescan</i>:</p>
 
-        <h2>Acceso y reverse shell</h2>
-        <p>Con las credenciales accedemos a WordPress y subimos una reverse shell.</p>
-        <img src="img/image-9.png" alt="Subida reverse shell">
+        <img src="img/image-2.png" alt="filescan">
 
-        <p>Provocamos un error 404 para ejecutarla:</p>
-        <img src="img/image-10.png" alt="Ejecución de reverse shell">
+        <p>Vemos los 2 archivos están cargados en memoria, lo cual significa que podemos extraerlos y ver su contenido:</p>
 
-        <h2>Escalada de privilegios</h2>
-        <p>Estamos dentro como el usuario <code>daemon</code>, el cual no puede ejecutar sudo. Revisamos binarios con SUID:</p>
-        <img src="img/image-11.png" alt="SUIDs encontrados">
+        <img src="img/image-3.png" alt="dumpfile">
 
-        <p>Con <a href="https://gtfobins.github.io/">GTFOBins</a> descubrimos que podemos usar <code>nmap</code> para escalar privilegios:</p>
-        <img src="img/image-12.png" alt="Uso de Nmap para root">
+        <p>Si analizamos el script, veremos que su función es cifrar un archivo con el método xor y volverlo a cifrar en base64:</p>
 
-        <p>Y finalmente conseguimos una shell como root:</p>
-        <img src="img/image-13.png" alt="Shell root">
+        <img src="img/image-4.png" alt="script">
 
-        <p>Ahora puedes buscar las flags restantes… ¡te toca!</p>
+        <p>No supone un reto muy complejo, además que podemos descifrarlo muy fácilmente con cyberchef y encontrar así la primera mitad de la flag:</p>
 
-        <blockquote style="color:#222; font-weight: bold;">fsociety</blockquote>
+        <img src="img/image-5.png" alt="Primera mitad">
+
+        <h3>Problema</h3>
+
+        <p>Si, tenemos un problema. Las 2 <i>pistas</i> del enunciado las acabamos de gastar en el apartado anterior. Igualmente, como necesitamos la herramienta <i>steghide</i>, asumo queda
+          debemos buscar una imagen, esto debido a que la herramienta permite <i>esconder</i> cosas en imágenes.</p>
+
+        <p>Vamos a intentar hacer eso, a ver qué encontramos:</p>
+
+        <img src="img/image-6.png" alt="Busqueda">
+
+        <pre>Podría haber filtrado por extensiones también, como jpg, jpeg, etc.</pre>
+
+        <p>Encontramos un archivo sospechoso en el escritorio del usuario, obviamente lo extraemos y lo analizamos.</p>
+
+        <img src="img/image-7.png" alt="mmmh...">
+
+        <pre>mmh...</pre>
+
+        <img src="img/image-8.png" alt="info">
+
+        <p>En la imagen vemos un intento de sacar información del archivo. Sin embargo, nos dice que la contraseña es incorrecta. Como dato, si la herramienta nos pide una contraseña, 
+          significa que, efectivamente, el archivo tiene algo escondido. Si usamos la primera mitad de la flag como contraseña en steghide, podremos extraer la segunda mitad de la flag, completando así el reto.</p>
+
+        <p>Aunque no lo parezca, hemos aprendido varias cosas con este reto. Lo primero es que un atacante puede cambiar el nombre a programas para <i>intentar</i> pasar desapercibido.
+          Probablemente, ese <i>NOTEPAD.EXE</i> sea realmente <i>python.exe</i>. Hemos visto como funciona un malware, aunque sí que es cierto que fue uno muy básico. Y por último,
+          hemos visto la herramienta <i>steghide</i>, muy común en retos ctfs</p>
+        
+        <a href="../Memlabs - Lab 2/index.html">Ir al laboratorio anterior</a> <br>
+        <a href="../Memlabs - Lab 4/index.html">Ir al siguiente laboratorio</a>
     </div>
 </body>
 </html>
