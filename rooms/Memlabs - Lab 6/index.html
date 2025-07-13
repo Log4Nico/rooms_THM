@@ -2,79 +2,124 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mr. Robot - Writeup Log4Nico</title>
+  <title>MemLabs - 6 - Writeup Log4Nico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="container">
-        <h1>Mr. Robot - Write-Up</h1>
-        <p>En este reto tematizado de <strong>Mr. Robot</strong> en <a href="https://tryhackme.com/room/mrrobot">TryHackMe</a>, el objetivo es vulnerar una máquina. Una parte clave del proceso es el uso de Burp Suite, especialmente su módulo Intruder, que permite automatizar el envío de múltiples peticiones de login y analizar las respuestas para detectar accesos válidos.</p>
+        <h1>MemLabs - 6 - Write-Up</h1>
+        <p>En este write-up, me adentro en los retos de <a href="https://github.com/stuxnet999/MemLabs">MemLabs</a>, una serie de laboratorios diseñados para poner a prueba 
+          nuestras habilidades en el análisis de volcados de memoria. Equipado con <b>Volatility</b>, una de las herramientas 
+          más potentes para diseccionar sistemas vivos o caídos, iré desenterrando credenciales, procesos sospechosos, 
+          conexiones de red y cualquier pista que hayan dejado atrás.</p>
 
-        <h2>Análisis inicial</h2>
-        <p>Empezamos escaneando los puertos de la máquina:</p>
-        <img src="img/image.png" alt="Escaneo de puertos">
+        <p>El momento ha llegado, damos pie al último reto, el más complicado del desafío, <a href="https://github.com/stuxnet999/MemLabs/tree/master/Lab%206">MemLabs Lab 6 - The Reckoning</a></p>
 
+        <h2>Enunciado</h2>
+
+        <p>Recibimos este volcado de memoria del Departamento de Inteligencia. Dicen que esta evidencia podría contener secretos del mafioso del bajo mundo, 
+          David Benjamin. Este volcado fue extraído de uno de sus trabajadores, a quien el FBI detuvo a principios de esta semana.
+          Tu tarea es revisar el volcado de memoria y ver si puedes descubrir algo. El FBI también comenta que David se comunicaba con sus trabajadores por internet, 
+          así que podría ser un buen punto de partida.</p>
+        
+        <h2>¿Qué sacamos en claro?</h2>
         <ul>
-            <li>Puerto 22 - SSH</li>
-            <li>Puerto 80 - Apache HTTP</li>
-            <li>Puerto 443 - Apache HTTPS</li>
+          <li>David se comunicaba por internet.</li>
         </ul>
 
-        <blockquote>Ambos servicios web alojan la misma página.</blockquote>
+        <p>Además, este reto solo tiene 1 flag dividia en 2.</p>
 
-        <h2>Exploración web</h2>
-        <img src="img/image-1.png" alt="Página principal">
+        <h2>Análisis del perfil</h2>
+        
+        <p>Para sacar la memoria debemos usar el siguiente comando:</p>
 
-        <blockquote>Hola, amigo. Si has llegado, has llegado por una razón... Hoy empieza tu educación.</blockquote>
+        <code>vol.py -f MemoryDump_Lab6.raw imageinfo</code>
 
-        <p>Si sois fans de la serie, os recomiendo explorar todas las opciones que ofrece la página. Está repleta de referencias.</p>
-        <img src="img/image-2.png" alt="Opciones">
+        <img src="img/image.png" alt="perfil">
 
-        <h2>Fuzzing</h2>
-        <p>Ejecutamos un fuzzeo básico:</p>
-        <pre>gobuster dir -u http://[IP] -w /usr/share/seclists/Discovery/Web-Content/common.txt</pre>
+        <p>Como ya he dicho varias veces, podemos usar cualquira que nos salga.</p>
+        
+        <h2>Análisis de la memoria</h2>
+        
+        <h3>Internet</h3>
 
-        <p>Encontramos <code>/robots.txt</code> con un diccionario y una flag:</p>
-        <img src="img/image-3.png" alt="robots.txt">
+        <p>Cuando hablamos de <i>internet</i>, lo que primero que se nos viene a la cabeza es el historial del navegador, así que empecemos por ahí.</p>
 
-        <p>También vemos el formulario de login de WordPress:</p>
-        <img src="img/image-4.png" alt="WordPress login">
+        <p>Lo primero que haré es ver si el archivo del historial está cargado en la memoria con <b>filescan</b>:</p>
 
-        <h2>Fuerza bruta de credenciales</h2>
-        <p>Decidí usar Burp Suite para encontrar el usuario.</p>
-        <img src="img/image-5.png" alt="Intercept">
+        <img src="img/image-1.png" alt="historial">
 
-        <p>Tras interceptar la petición, la enviamos a Intruder y lanzamos el ataque con una lista de usuarios:</p>
-        <img src="img/image-6.png" alt="Ataque usuario">
+        <p>Ahora podemos pasar a exportar el archivo con <b>dumpfiles</b> y abrirlo con sqlitebrowser:</p>
 
-        <p>Identificamos una respuesta diferente que revela el usuario correcto:</p>
-        <img src="img/image-7.png" alt="Usuario encontrado">
+        <img src="img/image-2.png" alt="extraer historial">
 
-        <p>Ahora a por la contraseña. Usaré el mismo metodo de antes, pero ahora sabiendo el nombre de usuario. 
-          El diccionario que encontramos antes, tiene más de 850.000 entradas, así que lo divido para acelerar.</p>
-        <img src="img/image-8.png" alt="Contraseña encontrada">
+        <p>Y para ver las páginas a las que accedió, seguimos los siguientes pasos:</p>
 
-        <h2>Acceso y reverse shell</h2>
-        <p>Con las credenciales accedemos a WordPress y subimos una reverse shell.</p>
-        <img src="img/image-9.png" alt="Subida reverse shell">
+        <img src="img/image-3.png" alt="ver historial">
 
-        <p>Provocamos un error 404 para ejecutarla:</p>
-        <img src="img/image-10.png" alt="Ejecución de reverse shell">
+        <p>Lo único <i>extraño</i> que veo, es el siguiente link de <b>pastebin</b>, aplicación web que funciona como un <i>portapapeles</i> en línea</p>
 
-        <h2>Escalada de privilegios</h2>
-        <p>Estamos dentro como el usuario <code>daemon</code>, el cual no puede ejecutar sudo. Revisamos binarios con SUID:</p>
-        <img src="img/image-11.png" alt="SUIDs encontrados">
+        <img src="img/image-4.png" alt="pastebin">
 
-        <p>Con <a href="https://gtfobins.github.io/">GTFOBins</a> descubrimos que podemos usar <code>nmap</code> para escalar privilegios:</p>
-        <img src="img/image-12.png" alt="Uso de Nmap para root">
+        <img src="img/image-5.png" alt="contenido pastebin">
 
-        <p>Y finalmente conseguimos una shell como root:</p>
-        <img src="img/image-13.png" alt="Shell root">
+        <p>El enlace a google documents, nos lleva a un documento lleno de frases en latin, pero, escondido en los parrafos, encontramos otra URL al sitio <b>mega</b>:</p>
+        
+        <img src="img/image-6.png" alt="contenido documento">
 
-        <p>Ahora puedes buscar las flags restantes… ¡te toca!</p>
+        <p>Desgraciadamente, el archivo está encriptado por contraseña, contraseña que aún no tenemos. Dejamos el enlace a mega apartado y seguimos buscando.</p>
+        
+        <img src="img/image-7.png" alt="mega cifrado">
 
-        <blockquote style="color:#222; font-weight: bold;">fsociety</blockquote>
+        <p>Usando <b>hashdump</b>, encontramos 2 usuarios en el sistema: <i>Jaffa</i> y <i>g4rud4</i>.</p>
+
+        <img src="img/image-8.png" alt="usuarios">
+
+        <p>En el directorio de <i>g4rud4</i> no hay nada interesante, a diferencia del de <i>Jaffa</i>, en el cual podemos encontrar una flag protegida:</p>
+
+        <img src="img/image-9.png" alt="escritorio Jaffa">
+
+        <img src="img/image-10.png" alt="protected flag">
+
+        <p>Al intentar descomprimir no nos da ninguna pista, pero asumo que está escondida en la memoria, veamos si las variables de entorno guardan algo interesante:</p>
+
+        <img src="img/image-11.png" alt="contraseña rar">
+
+        <p>Efectivamente, encontramos la contraseña del archivo comprimido así como la segunda mitad flag, pero aún nos queda la primera.</p>
+
+        <p>Podemos intentar usar el módulo <b>screenshot</b>, el cual nos devuelve imágenes de los últimos momentos de la extracción de la memoria:</p>
+
+        <img src="img/image-12.png" alt="screenshot">
+
+        <p>No sacamos nada así.</p>
+
+        <p>Lo único que se me ocurre es hacer un <b>strings</b> de la memoria completa filtrando con <i>Mega Drive</i>:</p>
+
+        <pre>El comando <i>strings</i> se utiliza para ver las líneas <i>leibles</i> de un archivo, independintemente de la extensión.</pre>
+        <pre>Es como si abriesemos un archivo con el blog de notas y solo nos quedaramos con las palabras que entendemos.</pre>
+
+        <img src="img/image-13.png" alt="The Key is ...">
+
+        <p>Tenemos el archivo, problema, no se abre, solución, los números mágicos no son correctos, los editamos con cualquier edito hexadecimal, y tandríamos la solución al desafío:</p>
+
+        <img src="img/image-14.png" alt="números mágicos">
+        <pre>Según Wikipedia, el hexadecimal de los archivos png deben empezar con esos números.</pre>
+
+        <img src="img/image-15.png" alt="primera flag">
+        <img src="img/image-16.png" alt="segunda flag"> 
+
+        <p>Con este último reto concluyo la serie completa de MemLabs, un conjunto de desafíos centrados en el análisis forense de memoria RAM
+           que me han permitido profundizar y consolidar conocimientos clave en el uso de herramientas como Volatility.</p>
+
+        <p>Durante el proceso he tenido la oportunidad de enfrentarme a escenarios realistas, aprender a interpretar artefactos de memoria,
+           identificar actividad sospechosa y afinar el enfoque analítico necesario para este tipo de investigaciones. 
+           Cada write-up que he realizado refleja no solo la solución técnica, sino también el aprendizaje detrás de cada caso.</p>
+
+        <p>Agradezco el esfuerzo de quienes desarrollaron estos retos: su calidad y variedad los convierten en una excelente referencia para quienes 
+          quieran introducirse o avanzar en el mundo del memory forensics.</p>
+
+        <a href="../Memlabs - Lab 5/index.html">Ir al laboratorio anterior</a> <br>
     </div>
 </body>
 </html>
